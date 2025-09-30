@@ -1,9 +1,10 @@
-// @todo: Темплейт карточки
 
-// @todo: DOM узлы
+import './images/avatar.jpg';
+import './images/logo.svg';
+import './pages/index.css';
 
-// @todo: Функция создания карточки
+import { initPlaceCardsWorkflow } from './cards.js';
+import { initProfileWorkflow } from './profile.js';
 
-// @todo: Функция удаления карточки
-
-// @todo: Вывести карточки на страницу
+initProfileWorkflow();
+initPlaceCardsWorkflow();
