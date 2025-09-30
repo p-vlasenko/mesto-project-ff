@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "mesto-project-ff study project package",
   "main": "index.js",
-  "repository": "https://github.com/p-vlasenko/mesto-project-ff",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p-vlasenko/mesto-project-ff"
+  },
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack serve --open"
