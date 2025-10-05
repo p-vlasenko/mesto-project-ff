@@ -1,12 +1,17 @@
 import {
-    flow,
     getFormOrFail,
     getFormSubmitButton,
     getFromElementOrFail,
-    getPopupCloseButton,
-    initFormPopupCommonHandlers,
+} from './form.js';
+import {
+    getModalCloseButton,
+    initFormModalHandlers,
+} from './modal.js';
+import {
+    noop,
+    flow,
     isEmptyText,
-    makeStrictFirstElementByClassNameGetter
+    makeStrictFirstElementByClassNameGetter,
 } from './utils.js';
 
 /**
@@ -18,11 +23,11 @@ import {
  */
 
 /**
- * @typedef {Omit<import('./utils.js').PopupFromElements, 'inputs'> & ProfileWorkflowAdditionalElements} ProfileWorkflowElements
+ * @typedef {Omit<import('./utils.js').ModalFromElements, 'inputs'> & ProfileWorkflowAdditionalElements} ProfileWorkflowElements
  */
 
 const getProfileEditButton = makeStrictFirstElementByClassNameGetter('profile__edit-button', document);
-const getProfileEditFormPopup = makeStrictFirstElementByClassNameGetter('popup_type_edit', document);
+const getProfileEditFormModal = makeStrictFirstElementByClassNameGetter('popup_type_edit', document);
 const getProfileTitleElement = makeStrictFirstElementByClassNameGetter('profile__title', document);
 const getProfileDescriptionElement = makeStrictFirstElementByClassNameGetter('profile__description', document);
 
@@ -30,19 +35,19 @@ const getProfileDescriptionElement = makeStrictFirstElementByClassNameGetter('pr
  * @returns {ProfileWorkflowElements}
  */
 const getElements = () => {
-    const popupRootElement = getProfileEditFormPopup();
+    const modal = getProfileEditFormModal();
     const form = getFormOrFail('edit-profile');
 
     return ({
-        popupRootElement,
+        modal,
         form,
-        openPopupButton: getProfileEditButton(),
-        closePopupButton: getPopupCloseButton(popupRootElement),
+        openModalButton: getProfileEditButton(),
+        closeModalButton: getModalCloseButton(modal),
         nameInput: getFromElementOrFail(form, 'name'),
         descriptionInput: getFromElementOrFail(form, 'description'),
         submitFormButton: getFormSubmitButton(form),
         profileTitleElement: getProfileTitleElement(),
-        profileDescriptionElement: getProfileDescriptionElement()
+        profileDescriptionElement: getProfileDescriptionElement(),
     });
 };
 
@@ -50,7 +55,7 @@ const getElements = () => {
  * @param {ProfileWorkflowElements} elements
  * @returns {void}
  */
-const initEditProfilePopup = elements => {
+const initEditProfileModal = elements => {
     const {
         nameInput,
         descriptionInput,
@@ -72,10 +77,20 @@ const initEditProfilePopup = elements => {
         profileDescriptionElement.textContent = descriptionInput.value;
     };
 
-    initFormPopupCommonHandlers({
+    const setInputValues = () => {
+        nameInput.value = profileTitleElement.textContent;
+        profileDescriptionElement.textContent = descriptionInput.value;
+    };
+
+    initFormModalHandlers({
         elements: { submitFormButton, inputs, ...rest },
-        handlers: { isFormValid, onSubmit }
+        handlers: {
+            isFormValid,
+            onSubmit,
+            beforeOpen: setInputValues,
+            beforeClose: noop,
+        },
     });
 };
 
-export const initProfileWorkflow = flow(getElements, initEditProfilePopup);
+export const initProfileWorkflow = flow(getElements, initEditProfileModal);

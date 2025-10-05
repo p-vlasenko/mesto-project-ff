@@ -1,9 +1,11 @@
+export const noop = () => {};
+
 /**
  * @param {Function[]} fns
  * @param param - first function parameter
  * @returns
  */
-export const flow = (...fns) => param => fns.reduce((result, fn) => fn(result),  param);
+export const flow = (...fns) => param => fns.reduce((result, fn) => fn(result), param);
 
 /**
  * @returns {DocumentFragment}
@@ -11,7 +13,8 @@ export const flow = (...fns) => param => fns.reduce((result, fn) => fn(result), 
 export const makeFragment = () => document.createDocumentFragment();
 
 /**
- * @returns {DocumentFragment}
+ * @param {(param: T) => U} fn
+ * @returns {(list: Array<T>) => Array<U>}
  */
 export const map = fn => list => list.map(fn);
 
@@ -37,7 +40,7 @@ export const passthrough = fn => param => {
     fn(param);
 
     return param;
-}
+};
 
 /**
  *
@@ -50,7 +53,7 @@ export const assert = (predicate, message) => {
     if (!predicate) {
         throw new Error(`Assertion error: ${message}`, { });
     }
-}
+};
 
 /**
  * @param {string} className
@@ -117,7 +120,7 @@ export const wrapToFragment = elements => elements.reduce(
 
         return fragment;
     },
-    makeFragment()
+    makeFragment(),
 );
 
 /**
@@ -154,23 +157,19 @@ export const isNil = value => value === null || value === undefined;
  */
 export const showPopup = popup => {
     popup.classList.add('popup_is-opened');
-}
+};
 
 /**
  * @param {HTMLElement} popup
  */
 export const closePopup = popup => {
     popup.classList.remove('popup_is-opened');
-}
+};
 
-export const makeKeydownHandler = (key, onPress) => {
-    const handleKeydown = evt => {
-        if (evt.key === key) {
-            onPress();
-        };
+export const makeKeydownHandler = (key, onPress) => evt => {
+    if (evt.key === key) {
+        onPress();
     };
-
-    document.addEventListener('keydown', handleKeydown);
 };
 
 export const isEmptyText = text => text.trim().length === 0;
@@ -187,83 +186,7 @@ export const enablePopupButton = button => {
 
 export const getPopupCloseButton = popupElement => getFirstElementByClassNameOrFail(
     'popup__close',
-    popupElement
+    popupElement,
 );
 
 export const getFormSubmitButton = form => getFirstElementByClassNameOrFail('button', form);
-
-/**
- * @typedef {object} PopupFromElements
- * @property {HTMLElement} openPopupButton
- * @property {HTMLElement} closePopupButton
- * @property {HTMLElement} submitFromButton
- * @property {HTMLElement} form
- * @property {HTMLElement} popupRootElement
- * @property {HTMLInputElement[]} inputs
- */
-
-/**
- * @typedef {object} PopupFromHandlers
- * @property {() => void} onSubmit
- * @property {(form: HTMLFormElement) => boolean} isFormValid
- */
-
-/**
- * @typedef {object} params
- * @typedef {PopupFromElements} params.elements
- * @typedef {PopupFromHandlers} params.handlers
- */
-export const initFormPopupCommonHandlers = ({ elements, handlers }) => {
-    const {
-        openPopupButton,
-        closePopupButton,
-        popupRootElement,
-        submitFormButton,
-        inputs,
-        form
-    } = elements;
-
-    const { onSubmit, isFormValid } = handlers;
-
-    const setSubmitButtonState = () => {
-        if (isFormValid(form)) {
-            enablePopupButton(submitFormButton);
-        } else {
-            disablePopupButton(submitFormButton);
-        }
-    };
-
-    setSubmitButtonState();
-
-    const handleSubmitButtonClick = evt => {
-        evt.preventDefault();
-        onSubmit();
-        handleCloseEvent();
-    }
-
-    submitFormButton.addEventListener('click', handleSubmitButtonClick);
-
-    inputs.forEach(input => input.addEventListener('input', setSubmitButtonState));
-
-    const handleCloseEvent = () => {
-        closePopup(popupRootElement);
-        document.removeEventListener('keydown', handleEscapeKeydown);
-    };
-
-    const handleEscapeKeydown = makeKeydownHandler('Escape', handleCloseEvent);
-
-    const handlePopupOverlayClick = evt => {
-        if (evt.target === popupRootElement) {
-            handleCloseEvent();
-        }
-    };
-
-    const handleOpenPopupButtonClick = () => {
-        showPopup(popupRootElement);
-        document.removeEventListener('keydown', handleEscapeKeydown);
-    };
-
-    openPopupButton.addEventListener('click', handleOpenPopupButtonClick);
-    closePopupButton.addEventListener('click', handleCloseEvent);
-    popupRootElement.addEventListener('mousedown', handlePopupOverlayClick);
-};
