@@ -1,21 +1,8 @@
-import {
-    getFormOrFail,
-    getFormSubmitButton,
-    getFromElementOrFail,
-} from './form.js';
-import {
-    getModalCloseButton,
-    initFormModalHandlers,
-} from './modal.js';
-import {
-    flow,
-    isEmptyText,
-    makeStrictFirstElementByClassNameGetter,
-    noop,
-} from './utils.js';
+import { initFormModalHandlers } from './modal.js';
+import { isEmptyText, noop } from './utils.js';
 
 /**
- * @typedef {object} ProfileWorkflowAdditionalElements
+ * @typedef {object} ProfileElements
  * @property {HTMLInputElement} nameInput
  * @property {HTMLInputElement} descriptionInput
  * @property {HTMLElement} profileTitleElement
@@ -23,34 +10,11 @@ import {
  */
 
 /**
- * @typedef {Omit<import('./utils.js').ModalFromElements, 'inputs'> & ProfileWorkflowAdditionalElements} ProfileWorkflowElements
+ * @typedef {Omit<import('./utils.js').ModalFromElements, 'inputs'> & ProfileElements} ProfileWorkflowElements
  */
 
-const getProfileEditButton = makeStrictFirstElementByClassNameGetter('profile__edit-button', document);
-const getProfileEditFormModal = makeStrictFirstElementByClassNameGetter('popup_type_edit', document);
-const getProfileTitleElement = makeStrictFirstElementByClassNameGetter('profile__title', document);
-const getProfileDescriptionElement = makeStrictFirstElementByClassNameGetter('profile__description', document);
-
-/** @type {() => ProfileWorkflowElements} */
-const getElements = () => {
-    const modal = getProfileEditFormModal();
-    const form = getFormOrFail('edit-profile');
-
-    return ({
-        modal,
-        form,
-        openModalButton: getProfileEditButton(),
-        closeModalButton: getModalCloseButton(modal),
-        nameInput: getFromElementOrFail(form, 'name'),
-        descriptionInput: getFromElementOrFail(form, 'description'),
-        submitFormButton: getFormSubmitButton(form),
-        profileTitleElement: getProfileTitleElement(),
-        profileDescriptionElement: getProfileDescriptionElement(),
-    });
-};
-
 /** @type {(elements: ProfileWorkflowElements) => void} */
-const initEditProfileModal = elements => {
+export const initEditProfileModal = elements => {
     const {
         nameInput,
         descriptionInput,
@@ -87,5 +51,3 @@ const initEditProfileModal = elements => {
         },
     });
 };
-
-export const initProfileWorkflow = flow(getElements, initEditProfileModal);

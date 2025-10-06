@@ -32,10 +32,6 @@ export const assert = (predicate, message) => {
     }
 };
 
-/** @type {(className: string, containerElement: HTMLElement) => () => HTMLElement} */
-export const makeStrictFirstElementByClassNameGetter = (className, containerElement) => () =>
-    getFirstElementByClassNameOrFail(className, containerElement);
-
 /** @type {(className: string, containerElement: HTMLElement) => HTMLElement} */
 export const getFirstElementByClassNameOrFail = (className, containerElement) => {
     const element = containerElement.querySelector(`.${className}`);
@@ -84,16 +80,6 @@ export const setText = text => element => {
 /** @type {(value: unknown) => boolean} */
 export const isNil = value => value === null || value === undefined;
 
-/** @type {(popup: HTMLElement) => void} */
-export const showPopup = popup => {
-    popup.classList.add('popup_is-opened');
-};
-
-/** @type {(popup: HTMLElement) => void} */
-export const closePopup = popup => {
-    popup.classList.remove('popup_is-opened');
-};
-
 /** @type {(key: string, onPress: () => void) => (evt: KeyboardEvent) => void} */
 export const makeKeydownHandler = (key, onPress) => evt => {
     if (evt.key === key) {
@@ -103,24 +89,3 @@ export const makeKeydownHandler = (key, onPress) => evt => {
 
 /** @type {(text: string) => boolean} */
 export const isEmptyText = text => text.trim().length === 0;
-
-/** @type {(button: HTMLElement) => void} */
-export const disableModalButton = button => {
-    button.classList.add('popup__button_disabled');
-    button.disabled = true;
-};
-
-/** @type {(button: HTMLElement) => void} */
-export const enableModalButton = button => {
-    button.classList.remove('popup__button_disabled');
-    button.disabled = false;
-};
-
-/** @type {(popupElement: HTMLElement) => HTMLElement} */
-export const getModalCloseButton = popup => getFirstElementByClassNameOrFail(
-    'popup__close',
-    popup,
-);
-
-/** @type {(form: HTMLElement) => HTMLElement} */
-export const getFormSubmitButton = form => getFirstElementByClassNameOrFail('button', form);

@@ -1,13 +1,4 @@
-import {
-    getFormOrFail,
-    getFormSubmitButton,
-    getFromElementOrFail,
-} from './form.js';
-import {
-    getModalCloseButton,
-    initFormModalHandlers,
-    initModalHandlers,
-} from './modal.js';
+import { initFormModalHandlers, initModalHandlers } from './modal.js';
 import {
     appendTo,
     cloneTemplateContent,
@@ -15,7 +6,6 @@ import {
     getFirstElementByClassNameOrFail,
     isEmptyText,
     makeClosestElementByClassNameRemover,
-    makeStrictFirstElementByClassNameGetter,
     makeStrictTemplateElementGetter,
     map,
     noop,
@@ -76,19 +66,9 @@ export const initialCards = [
 ];
 
 const getCardTemplate = makeStrictTemplateElementGetter('card-template', document);
-const getCardListElement = makeStrictFirstElementByClassNameGetter('places__list', document);
-const getNewCardModal = makeStrictFirstElementByClassNameGetter('popup_type_new-card', document);
-const getImageModal = makeStrictFirstElementByClassNameGetter('popup_type_image', document);
-const getAddCardButton = makeStrictFirstElementByClassNameGetter('profile__add-button', document);
 
 /** @type {() => HTMLElement} */
 const getCardImageElement = cardElement => getFirstElementByClassNameOrFail('card__image', cardElement);
-
-/** @type {() => HTMLImageElement} */
-const getPreviewImageElement = () => getFirstElementByClassNameOrFail('popup__image', document);
-
-/** @type {() => HTMLElement} */
-const getPreviewPlaceElement = () => getFirstElementByClassNameOrFail('popup__caption', document);
 
 /** @type {(cardElement: HTMLElement) => HTMLElement} */
 const getCardTitleElement = cardElement => getFirstElementByClassNameOrFail('card__title', cardElement);
@@ -174,30 +154,8 @@ const addCards = cards => cardListElement => flow(
     appendTo(cardListElement),
 )(cards);
 
-/** @type {() => CardWorkflowElements} */
-const getElements = () => {
-    const newCardModal = getNewCardModal();
-    const imageModal = getImageModal();
-    const newCardFrom = getFormOrFail('new-place');
-
-    return ({
-        newCardModal,
-        imageModal,
-        newCardFrom,
-        placesListElement: getCardListElement(),
-        placeNameInput: getFromElementOrFail(newCardFrom, 'place-name'),
-        linkInput: getFromElementOrFail(newCardFrom, 'link'),
-        addCardButton: getAddCardButton(),
-        closeNewCardModalButton: getModalCloseButton(newCardModal),
-        closeImageModalButton: getModalCloseButton(imageModal),
-        submitNewCardFormButton: getFormSubmitButton(newCardFrom),
-        previewImageElement: getPreviewImageElement(),
-        previewPlaceElement: getPreviewPlaceElement(),
-    });
-};
-
 /** @type {(elements: CardWorkflowElements) => void} */
-const initNewCardModal = elements => {
+export const initNewCardModal = elements => {
     const {
         submitNewCardFormButton,
         placeNameInput,
@@ -242,7 +200,7 @@ const initNewCardModal = elements => {
 };
 
 /** @type {(cards: Card[]) => (elements: CardWorkflowElements) => void} */
-const initPlacesList = cards => elements => {
+export const initPlacesList = cards => elements => {
     const {
         placesListElement,
         imageModal,
@@ -288,10 +246,3 @@ const initPlacesList = cards => elements => {
         }),
     )(placesListElement);
 };
-
-/** @type {(cards: Card[]) => void} */
-export const initPlaceCardsWorkflow = cards => flow(
-    getElements,
-    passthrough(initPlacesList(cards)),
-    initNewCardModal,
-)();
