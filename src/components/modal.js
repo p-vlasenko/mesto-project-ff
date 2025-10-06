@@ -46,8 +46,8 @@ export const getModalCloseButton = modal => getFirstElementByClassNameOrFail(
  * @typedef {object} ModalFromHandlers
  * @property {() => void} onSubmit
  * @property {(form: HTMLFormElement) => boolean} isFormValid
- * @property {() => void} beforeClose
- * @property {() => void} beforeOpen
+ * @property {() => void} onClose
+ * @property {() => void} onOpen
  */
 
 /**
@@ -69,7 +69,7 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
         ...popupElements
     } = elements;
 
-    const { onSubmit, isFormValid, beforeClose, beforeOpen } = handlers;
+    const { onSubmit, isFormValid, onClose, onOpen } = handlers;
 
     const setSubmitButtonState = () => {
         if (isFormValid(form)) {
@@ -84,7 +84,7 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
 
     const { open, close } = initModalHandlers({
         elements: popupElements,
-        handlers: { beforeClose, beforeOpen },
+        handlers: { onClose, onOpen },
     });
 
     openModalButton.addEventListener('click', open);
@@ -103,7 +103,7 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
 /**
  * @param {ModalElements} param
  * @param {ModalElements} param.elements
- * @param {{ beforeClose: () => void }} param.handler
+ * @param {{ onClose: () => void }} param.handler
  *
  * @returns {{
  *   open: () => void;
@@ -112,27 +112,29 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
  */
 export const initModalHandlers = ({ elements, handlers }) => {
     const { closeModalButton, modal } = elements;
-    const { beforeClose, beforeOpen } = handlers;
+    const { onClose, onOpen } = handlers;
 
-    const close = () => {
-        closeModal(modal);
-        document.removeEventListener('keydown', handleEscapeKeydown);
-        beforeClose();
-    };
-
-    const handleEscapeKeydown = makeKeydownHandler('Escape', close);
-
+    /** @type {(evt: PointerEvent) => void} */
     const handleModalOverlayClick = evt => {
         if (evt.target === modal) {
             close();
         }
     };
 
-    closeModalButton.addEventListener('click', close);
     modal.addEventListener('mousedown', handleModalOverlayClick);
 
+    const close = () => {
+        closeModal(modal);
+        document.removeEventListener('keydown', handleEscapeKeydown);
+        onClose();
+    };
+
+    const handleEscapeKeydown = makeKeydownHandler('Escape', close);
+
+    closeModalButton.addEventListener('click', close);
+
     const open = () => {
-        beforeOpen();
+        onOpen();
         showModal(modal);
         document.addEventListener('keydown', handleEscapeKeydown);
     };

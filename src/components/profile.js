@@ -8,10 +8,10 @@ import {
     initFormModalHandlers,
 } from './modal.js';
 import {
-    noop,
     flow,
     isEmptyText,
     makeStrictFirstElementByClassNameGetter,
+    noop,
 } from './utils.js';
 
 /**
@@ -82,8 +82,8 @@ const initEditProfileModal = elements => {
         handlers: {
             isFormValid,
             onSubmit,
-            beforeOpen: setInputValues,
-            beforeClose: noop,
+            onOpen: setInputValues,
+            onClose: noop,
         },
     });
 };

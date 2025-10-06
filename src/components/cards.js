@@ -274,8 +274,8 @@ const initNewCardModal = elements => {
         handlers: {
             isFormValid: isNewCardFormValid,
             onSubmit: onNewCardFromSubmit,
-            beforeClose: () => newCardFrom.reset(),
-            beforeOpen: noop,
+            onClose: () => newCardFrom.reset(),
+            onOpen: noop,
         },
     });
 };
@@ -316,8 +316,8 @@ const initPlacesList = cards => elements => {
             closeModalButton: closeImageModalButton,
         },
         handlers: {
-            beforeClose: resetImagePreview,
-            beforeOpen: noop,
+            onClose: resetImagePreview,
+            onOpen: noop,
         },
     });
 
