@@ -31,9 +31,7 @@ const getProfileEditFormModal = makeStrictFirstElementByClassNameGetter('popup_t
 const getProfileTitleElement = makeStrictFirstElementByClassNameGetter('profile__title', document);
 const getProfileDescriptionElement = makeStrictFirstElementByClassNameGetter('profile__description', document);
 
-/**
- * @returns {ProfileWorkflowElements}
- */
+/** @type {() => ProfileWorkflowElements} */
 const getElements = () => {
     const modal = getProfileEditFormModal();
     const form = getFormOrFail('edit-profile');
@@ -51,10 +49,7 @@ const getElements = () => {
     });
 };
 
-/**
- * @param {ProfileWorkflowElements} elements
- * @returns {void}
- */
+/** @type {(elements: ProfileWorkflowElements) => void} */
 const initEditProfileModal = elements => {
     const {
         nameInput,

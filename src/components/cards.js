@@ -84,30 +84,27 @@ const getImageModal = makeStrictFirstElementByClassNameGetter('popup_type_image'
 const getAddCardButton = makeStrictFirstElementByClassNameGetter('profile__add-button', document);
 
 /**
- * @param {HTMLElement} cardElement
- * @returns {HTMLImageElement}
+ * @type {() => HTMLElement}
  */
 const getCardImageElement = cardElement => getFirstElementByClassNameOrFail('card__image', cardElement);
 
 /**
- * @returns {HTMLImageElement}
+ * @type {() => HTMLImageElement}
  */
 const getPreviewImageElement = () => getFirstElementByClassNameOrFail('popup__image', document);
 
 /**
- * @returns {HTMLImageElement}
+ * @type {() => HTMLElement}
  */
 const getPreviewPlaceElement = () => getFirstElementByClassNameOrFail('popup__caption', document);
 
 /**
- * @param {HTMLElement} cardElement
- * @returns {HTMLElement}
+ * @type {(cardElement: HTMLElement) => HTMLElement}
  */
 const getCardTitleElement = cardElement => getFirstElementByClassNameOrFail('card__title', cardElement);
 
 /**
- * @param {Card} param
- * @returns {(cardElement: HTMLElement) => void}
+ * @type {(card: Card) => (cardElement: HTMLElement) => void}
  */
 const setCardImageAttributes = ({ name, link }) => flow(
     getCardImageElement,
@@ -115,14 +112,12 @@ const setCardImageAttributes = ({ name, link }) => flow(
 );
 
 /**
- * @param {string} title
- * @returns {(cardElement: HTMLElement) => void}
+ * @type {(title: string) => (cardElement: HTMLElement) => void}
  */
 const setCardTitle = title => flow(getCardTitleElement, setText(title));
 
 /**
- * @param {Card} card
- * @returns {HTMLElement}
+ * @type {(card: Card) => HTMLElement}
  */
 const makeCardElement = card => flow(
     getCardTemplate,
@@ -132,32 +127,27 @@ const makeCardElement = card => flow(
 )();
 
 /**
- * @param {HTMLElement} element
- * @returns {boolean}
+ * @type {(element: HTMLElement) => boolean}
  */
 const isDeleteButton = element => element.classList.contains('card__delete-button');
 
 /**
- * @param {HTMLElement} element
- * @returns {boolean}
+ * @type {(element: HTMLElement) => boolean}
  */
 const isLikeButton = element => element.classList.contains('card__like-button');
 
 /**
- * @param {HTMLElement} element
- * @returns {boolean}
+ * @type {(element: HTMLElement) => boolean}
  */
 const isImage = element => element.classList.contains('card__image');
 
 /**
- * @param {HTMLElement}
- * @returns {void}
+ * @type {(element: HTMLElement) => void}
  */
 const removeClosestCardElement = makeClosestElementByClassNameRemover('.card');
 
 /**
- * @param {HTMLElement}
- * @returns {void}
+ * @type {(element: HTMLElement) => void}
  */
 const toggleLike = cardLikeButton => {
     cardLikeButton.classList.toggle('card__like-button_is-active');
@@ -172,8 +162,7 @@ const cardElement = {
 const UNKNOWN_BUTTON_TYPE = Symbol('UNKNOWN_BUTTON_TYPE');
 
 /**
- * @param {HTMLElement} element
- * @returns {keyof typeof cardElement | typeof UNKNOWN_BUTTON_TYPE}
+ * @type {(element: HTMLElement) => keyof typeof cardElement | typeof UNKNOWN_BUTTON_TYPE}
  */
 const getElementType = element =>
     isDeleteButton(element) ? cardElement.deleteButton :
@@ -189,8 +178,7 @@ const getElementType = element =>
  */
 
 /**
- * @param {CardButtonHandlers} handlers
- * @returns {(evt: PointerEvent) => void}
+ * @type {(handlers: CardButtonHandlers) => (evt: PointerEvent) => void}
  */
 const makeCardButtonClickHandler = ({ onDeleteButtonClick, onLikeButtonClick, onImageClick }) => evt => {
     const cardButtonClickHandlers = {
@@ -204,18 +192,16 @@ const makeCardButtonClickHandler = ({ onDeleteButtonClick, onLikeButtonClick, on
 };
 
 /**
- * @param {CardButtonHandlers} handlers
- * @returns {(cardList: HTMLElement) => void} cardList
+ * @type {(handlers: CardButtonHandlers) => (cardList: HTMLElement) => void}
  */
-const addCardButtonsHandler = handlers => cardList => {
+const addCardButtonHandlers = handlers => cardList => {
     const handleCardButtonClick = makeCardButtonClickHandler(handlers);
     cardList.addEventListener('click', handleCardButtonClick);
 };
 
 /**
  *
- * @param {Card[]} cards
- * @returns {(cardListElement: HTMLElement) => void)}
+ * @type {(cards: Card[]) => (cardListElement: HTMLElement) => void}
  */
 const addCards = cards => cardListElement => flow(
     map(makeCardElement),
@@ -224,59 +210,7 @@ const addCards = cards => cardListElement => flow(
 )(cards);
 
 /**
- * @type {() => void}
- */
-const initPlacesList = cards => params => {
-    const {
-        placesListElement,
-        imageModal,
-        closeImageModalButton,
-        previewImageElement,
-        previewPlaceElement,
-    } = params;
-
-    const resetImagePreview = () => {
-        previewImageElement.src = '';
-        previewImageElement.alt = '';
-        previewPlaceElement.textContent = '';
-    };
-
-    /**
-     *
-     * @param {Card} card
-     */
-    const initImagePreview = ({ link, name }) => {
-        previewImageElement.src = link;
-        previewImageElement.alt = name;
-        previewPlaceElement.textContent = name;
-    };
-
-    const { open: openImagePreviewModal } = initModalHandlers({
-        elements: {
-            modal: imageModal,
-            closeModalButton: closeImageModalButton,
-        },
-        handlers: {
-            beforeClose: resetImagePreview,
-            beforeOpen: noop,
-        },
-    });
-
-    return flow(
-        passthrough(addCards(cards)),
-        addCardButtonsHandler({
-            onDeleteButtonClick: removeClosestCardElement,
-            onLikeButtonClick: toggleLike,
-            onImageClick: image => {
-                initImagePreview({ link: image.src, name: image.alt });
-                openImagePreviewModal();
-            },
-        }),
-    )(placesListElement);
-};
-
-/**
- * @returns {CardWorkflowElements}
+ * @type {() => CardWorkflowElements}
  */
 const getElements = () => {
     const newCardModal = getNewCardModal();
@@ -300,8 +234,7 @@ const getElements = () => {
 };
 
 /**
- * @param {CardWorkflowElements} elements
- * @returns {void}
+ * @type {(elements: CardWorkflowElements) => void}
  */
 const initNewCardModal = elements => {
     const {
@@ -325,7 +258,7 @@ const initNewCardModal = elements => {
             link: linkInput.value,
         });
 
-        placesListElement.append(newCardElement);
+        placesListElement.prepend(newCardElement);
         newCardFrom.reset();
     };
 
@@ -348,7 +281,61 @@ const initNewCardModal = elements => {
 };
 
 /**
- * @returns {void}
+ * @type {(cards: Card[]) => (elements: CardWorkflowElements) => void}
+ */
+const initPlacesList = cards => elements => {
+    const {
+        placesListElement,
+        imageModal,
+        closeImageModalButton,
+        previewImageElement,
+        previewPlaceElement,
+    } = elements;
+
+    /**
+     * @type {() => void}
+     */
+    const resetImagePreview = () => {
+        previewImageElement.src = '';
+        previewImageElement.alt = '';
+        previewPlaceElement.textContent = '';
+    };
+
+    /**
+     * @type {(card: Card) => void}
+     */
+    const initImagePreview = ({ link, name }) => {
+        previewImageElement.src = link;
+        previewImageElement.alt = name;
+        previewPlaceElement.textContent = name;
+    };
+
+    const { open: openImagePreviewModal } = initModalHandlers({
+        elements: {
+            modal: imageModal,
+            closeModalButton: closeImageModalButton,
+        },
+        handlers: {
+            beforeClose: resetImagePreview,
+            beforeOpen: noop,
+        },
+    });
+
+    return flow(
+        passthrough(addCards(cards)),
+        addCardButtonHandlers({
+            onDeleteButtonClick: removeClosestCardElement,
+            onLikeButtonClick: toggleLike,
+            onImageClick: image => {
+                initImagePreview({ link: image.src, name: image.alt });
+                openImagePreviewModal();
+            },
+        }),
+    )(placesListElement);
+};
+
+/**
+ * @type {(cards: Card[]) => void}
  */
 export const initPlaceCardsWorkflow = cards => flow(
     getElements,

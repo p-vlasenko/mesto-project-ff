@@ -1,43 +1,28 @@
 import { getFirstElementByClassNameOrFail, makeKeydownHandler } from './utils.js';
 
-/**
- * @param {HTMLElement} modal
- * @returns {void}
- */
+/** @type {(modal: HTMLElement) => void} */
 export const showModal = modal => {
     modal.classList.add('popup_is-opened');
 };
 
-/**
- * @param {HTMLElement} modal
- * @returns {void}
- */
+/** @type {(modal: HTMLElement) => void} */
 export const closeModal = modal => {
     modal.classList.remove('popup_is-opened');
 };
 
-/**
- * @param {HTMLButtonElement} button
- * @returns {void}
- */
+/** @type {(button: HTMLButtonElement) => void} */
 export const disableModalButton = button => {
     button.classList.add('popup__button_disabled');
     button.disabled = true;
 };
 
-/**
- * @param {HTMLButtonElement} button
- * @returns {void}
- */
+/** @type {(button: HTMLButtonElement) => void} */
 export const enableModalButton = button => {
     button.classList.remove('popup__button_disabled');
     button.disabled = false;
 };
 
-/**
- * @param {HTMLElement} modal
- * @returns {HTMLButtonElement}
- */
+/** @type {(modal: HTMLElement) => HTMLButtonElement} */
 export const getModalCloseButton = modal => getFirstElementByClassNameOrFail(
     'popup__close',
     modal,

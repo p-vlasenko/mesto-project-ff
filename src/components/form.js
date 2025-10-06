@@ -3,8 +3,7 @@ import { assert, getFirstElementByClassNameOrFail } from './utils.js';
 export const getFormSubmitButton = form => getFirstElementByClassNameOrFail('button', form);
 
 /**
- * @param {string} name
- * @returns {HTMLFormElement}
+ * @type {(name: string) => HTMLFormElement}
  */
 export const getFormOrFail = name => {
     const form = document.forms[name];
@@ -14,9 +13,7 @@ export const getFormOrFail = name => {
 };
 
 /**
- * @param {HTMLFormElement} form
- * @param {string} elementName
- * @returns {HTMLFormElement}
+ * @type {(form: HTMLFormElement, elementName: string) => HTMLFormElement}
  */
 export const getFromElementOrFail = (form, elementName) => {
     const element = form.elements[elementName];
