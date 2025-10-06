@@ -38,7 +38,7 @@ export const initEditProfileModal = elements => {
 
     const setInputValues = () => {
         nameInput.value = profileTitleElement.textContent;
-        profileDescriptionElement.textContent = descriptionInput.value;
+        descriptionInput.value = profileDescriptionElement.textContent;
     };
 
     initFormModalHandlers({
