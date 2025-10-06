@@ -47,9 +47,7 @@ import {
  * @property {HTMLElement} placesListElement
  */
 
-/**
- * @type {Card[]}
- */
+/** @type {Card[]} */
 export const initialCards = [
     {
         name: 'Архыз',
@@ -83,42 +81,28 @@ const getNewCardModal = makeStrictFirstElementByClassNameGetter('popup_type_new-
 const getImageModal = makeStrictFirstElementByClassNameGetter('popup_type_image', document);
 const getAddCardButton = makeStrictFirstElementByClassNameGetter('profile__add-button', document);
 
-/**
- * @type {() => HTMLElement}
- */
+/** @type {() => HTMLElement} */
 const getCardImageElement = cardElement => getFirstElementByClassNameOrFail('card__image', cardElement);
 
-/**
- * @type {() => HTMLImageElement}
- */
+/** @type {() => HTMLImageElement} */
 const getPreviewImageElement = () => getFirstElementByClassNameOrFail('popup__image', document);
 
-/**
- * @type {() => HTMLElement}
- */
+/** @type {() => HTMLElement} */
 const getPreviewPlaceElement = () => getFirstElementByClassNameOrFail('popup__caption', document);
 
-/**
- * @type {(cardElement: HTMLElement) => HTMLElement}
- */
+/** @type {(cardElement: HTMLElement) => HTMLElement} */
 const getCardTitleElement = cardElement => getFirstElementByClassNameOrFail('card__title', cardElement);
 
-/**
- * @type {(card: Card) => (cardElement: HTMLElement) => void}
- */
+/** @type {(card: Card) => (cardElement: HTMLElement) => void} */
 const setCardImageAttributes = ({ name, link }) => flow(
     getCardImageElement,
     setImageAttributes({ src: link, alt: name }),
 );
 
-/**
- * @type {(title: string) => (cardElement: HTMLElement) => void}
- */
+/** @type {(title: string) => (cardElement: HTMLElement) => void} */
 const setCardTitle = title => flow(getCardTitleElement, setText(title));
 
-/**
- * @type {(card: Card) => HTMLElement}
- */
+/** @type {(card: Card) => HTMLElement} */
 const makeCardElement = card => flow(
     getCardTemplate,
     cloneTemplateContent,
@@ -126,29 +110,19 @@ const makeCardElement = card => flow(
     passthrough(setCardTitle(card.name)),
 )();
 
-/**
- * @type {(element: HTMLElement) => boolean}
- */
+/** @type {(element: HTMLElement) => boolean} */
 const isDeleteButton = element => element.classList.contains('card__delete-button');
 
-/**
- * @type {(element: HTMLElement) => boolean}
- */
+/** @type {(element: HTMLElement) => boolean} */
 const isLikeButton = element => element.classList.contains('card__like-button');
 
-/**
- * @type {(element: HTMLElement) => boolean}
- */
+/** @type {(element: HTMLElement) => boolean} */
 const isImage = element => element.classList.contains('card__image');
 
-/**
- * @type {(element: HTMLElement) => void}
- */
+/** @type {(element: HTMLElement) => void} */
 const removeClosestCardElement = makeClosestElementByClassNameRemover('.card');
 
-/**
- * @type {(element: HTMLElement) => void}
- */
+/** @type {(element: HTMLElement) => void} */
 const toggleLike = cardLikeButton => {
     cardLikeButton.classList.toggle('card__like-button_is-active');
 };
@@ -161,9 +135,7 @@ const cardElement = {
 
 const UNKNOWN_BUTTON_TYPE = Symbol('UNKNOWN_BUTTON_TYPE');
 
-/**
- * @type {(element: HTMLElement) => keyof typeof cardElement | typeof UNKNOWN_BUTTON_TYPE}
- */
+/** @type {(element: HTMLElement) => keyof typeof cardElement | typeof UNKNOWN_BUTTON_TYPE} */
 const getElementType = element =>
     isDeleteButton(element) ? cardElement.deleteButton :
     isLikeButton(element) ? cardElement.likeButton :
@@ -177,9 +149,7 @@ const getElementType = element =>
  * @property {(button: HTMLElement) => void} onDeleteButtonClick
  */
 
-/**
- * @type {(handlers: CardButtonHandlers) => (evt: PointerEvent) => void}
- */
+/** @type {(handlers: CardButtonHandlers) => (evt: PointerEvent) => void} */
 const makeCardButtonClickHandler = ({ onDeleteButtonClick, onLikeButtonClick, onImageClick }) => evt => {
     const cardButtonClickHandlers = {
         [cardElement.deleteButton]: onDeleteButtonClick,
@@ -191,27 +161,20 @@ const makeCardButtonClickHandler = ({ onDeleteButtonClick, onLikeButtonClick, on
     handler?.(evt.target);
 };
 
-/**
- * @type {(handlers: CardButtonHandlers) => (cardList: HTMLElement) => void}
- */
+/** @type {(handlers: CardButtonHandlers) => (cardList: HTMLElement) => void} */
 const addCardButtonHandlers = handlers => cardList => {
     const handleCardButtonClick = makeCardButtonClickHandler(handlers);
     cardList.addEventListener('click', handleCardButtonClick);
 };
 
-/**
- *
- * @type {(cards: Card[]) => (cardListElement: HTMLElement) => void}
- */
+/** @type {(cards: Card[]) => (cardListElement: HTMLElement) => void} */
 const addCards = cards => cardListElement => flow(
     map(makeCardElement),
     wrapToFragment,
     appendTo(cardListElement),
 )(cards);
 
-/**
- * @type {() => CardWorkflowElements}
- */
+/** @type {() => CardWorkflowElements} */
 const getElements = () => {
     const newCardModal = getNewCardModal();
     const imageModal = getImageModal();
@@ -233,9 +196,7 @@ const getElements = () => {
     });
 };
 
-/**
- * @type {(elements: CardWorkflowElements) => void}
- */
+/** @type {(elements: CardWorkflowElements) => void} */
 const initNewCardModal = elements => {
     const {
         submitNewCardFormButton,
@@ -280,9 +241,7 @@ const initNewCardModal = elements => {
     });
 };
 
-/**
- * @type {(cards: Card[]) => (elements: CardWorkflowElements) => void}
- */
+/** @type {(cards: Card[]) => (elements: CardWorkflowElements) => void} */
 const initPlacesList = cards => elements => {
     const {
         placesListElement,
@@ -292,18 +251,14 @@ const initPlacesList = cards => elements => {
         previewPlaceElement,
     } = elements;
 
-    /**
-     * @type {() => void}
-     */
+    /** @type {() => void} */
     const resetImagePreview = () => {
         previewImageElement.src = '';
         previewImageElement.alt = '';
         previewPlaceElement.textContent = '';
     };
 
-    /**
-     * @type {(card: Card) => void}
-     */
+    /** @type {(card: Card) => void} */
     const initImagePreview = ({ link, name }) => {
         previewImageElement.src = link;
         previewImageElement.alt = name;
@@ -334,9 +289,7 @@ const initPlacesList = cards => elements => {
     )(placesListElement);
 };
 
-/**
- * @type {(cards: Card[]) => void}
- */
+/** @type {(cards: Card[]) => void} */
 export const initPlaceCardsWorkflow = cards => flow(
     getElements,
     passthrough(initPlacesList(cards)),
