@@ -3,13 +3,13 @@ import './images/logo.svg';
 import './pages/index.css';
 
 import { initNewCardModal, initPlacesList, initialCards } from './components/cards.js';
-import { initEditProfileModal } from './components/profile.js';
 import { getFormOrFail, getFormSubmitButton, getFromElementOrFail } from './components/form.js';
 import { getModalCloseButton } from './components/modal.js';
+import { initEditProfileModal } from './components/profile.js';
 import {
     flow,
-    passthrough,
     getFirstElementByClassNameOrFail,
+    passthrough,
 } from './components/utils.js';
 
 /** @typedef {import('./components/cards.js').CardWorkflowElements} CardWorkflowElements */
@@ -32,8 +32,8 @@ const getCardsWorkflowElements = () => {
         closeNewCardModalButton: getModalCloseButton(newCardModal),
         closeImageModalButton: getModalCloseButton(imageModal),
         submitNewCardFormButton: getFormSubmitButton(newCardFrom),
-        previewImageElement: getFirstElementByClassNameOrFail('popup__image', document),
-        previewPlaceElement: getFirstElementByClassNameOrFail('popup__caption', document),
+        imageModalImage: getFirstElementByClassNameOrFail('popup__image', document),
+        imageModalTitleElement: getFirstElementByClassNameOrFail('popup__caption', document),
     });
 };
 

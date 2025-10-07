@@ -84,7 +84,13 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
 
     const { open, close } = initModalHandlers({
         elements: popupElements,
-        handlers: { onClose, onOpen },
+        handlers: {
+            onClose,
+            onOpen: () => {
+                onOpen();
+                setSubmitButtonState();
+            },
+        },
     });
 
     openModalButton.addEventListener('click', open);
@@ -114,6 +120,15 @@ export const initModalHandlers = ({ elements, handlers }) => {
     const { closeModalButton, modal } = elements;
     const { onClose, onOpen } = handlers;
 
+    const close = () => {
+        closeModal(modal);
+        document.removeEventListener('keydown', handleEscapeKeydown);
+        onClose();
+    };
+
+    closeModalButton.addEventListener('click', close);
+    const handleEscapeKeydown = makeKeydownHandler('Escape', close);
+
     /** @type {(evt: PointerEvent) => void} */
     const handleModalOverlayClick = evt => {
         if (evt.target === modal) {
@@ -122,16 +137,6 @@ export const initModalHandlers = ({ elements, handlers }) => {
     };
 
     modal.addEventListener('mousedown', handleModalOverlayClick);
-
-    const close = () => {
-        closeModal(modal);
-        document.removeEventListener('keydown', handleEscapeKeydown);
-        onClose();
-    };
-
-    const handleEscapeKeydown = makeKeydownHandler('Escape', close);
-
-    closeModalButton.addEventListener('click', close);
 
     const open = () => {
         onOpen();

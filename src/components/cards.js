@@ -31,8 +31,8 @@ import {
  * @property {HTMLInputElement} linkInput
  * @property {HTMLElement} imageModal
  * @property {HTMLElement} closeImageModalButton
- * @property {HTMLImageElement} previewImageElement
- * @property {HTMLElement} previewPlaceElement
+ * @property {HTMLImageElement} imageModalImage
+ * @property {HTMLElement} imageModalTitleElement
  * @property {HTMLElement} cardImage
  * @property {HTMLElement} placesListElement
  */
@@ -205,31 +205,31 @@ export const initPlacesList = cards => elements => {
         placesListElement,
         imageModal,
         closeImageModalButton,
-        previewImageElement,
-        previewPlaceElement,
+        imageModalImage,
+        imageModalTitleElement,
     } = elements;
 
     /** @type {() => void} */
-    const resetImagePreview = () => {
-        previewImageElement.src = '';
-        previewImageElement.alt = '';
-        previewPlaceElement.textContent = '';
+    const resetImageModalContent = () => {
+        imageModalImage.src = '';
+        imageModalImage.alt = '';
+        imageModalTitleElement.textContent = '';
     };
 
     /** @type {(card: Card) => void} */
-    const initImagePreview = ({ link, name }) => {
-        previewImageElement.src = link;
-        previewImageElement.alt = name;
-        previewPlaceElement.textContent = name;
+    const initImageModalContent = ({ link, name }) => {
+        imageModalImage.src = link;
+        imageModalImage.alt = name;
+        imageModalTitleElement.textContent = name;
     };
 
-    const { open: openImagePreviewModal } = initModalHandlers({
+    const { open: openImageModal } = initModalHandlers({
         elements: {
             modal: imageModal,
             closeModalButton: closeImageModalButton,
         },
         handlers: {
-            onClose: resetImagePreview,
+            onClose: resetImageModalContent,
             onOpen: noop,
         },
     });
@@ -240,8 +240,8 @@ export const initPlacesList = cards => elements => {
             onDeleteButtonClick: removeClosestCardElement,
             onLikeButtonClick: toggleLike,
             onImageClick: image => {
-                initImagePreview({ link: image.src, name: image.alt });
-                openImagePreviewModal();
+                initImageModalContent({ link: image.src, name: image.alt });
+                openImageModal();
             },
         }),
     )(placesListElement);
