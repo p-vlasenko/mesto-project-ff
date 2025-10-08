@@ -1,36 +1,4 @@
-export const noop = () => {};
-
-/** @type {<T extends Function[]>(fns:T) => (param: Parameter<T[0]>) => unknown} */
-export const flow = (...fns) => param => fns.reduce((result, fn) => fn(result), param);
-
-/** @type {() => DocumentFragment} */
-export const makeFragment = () => document.createDocumentFragment();
-
-/** @type {<T, U>(fn: (param: T) => U) => (list: T[]) => U[]} */
-export const map = fn => list => list.map(fn);
-
-/** @type {(container: HTMLElement) => DocumentFragment} */
-export const appendTo = container => child => container.appendChild(child);
-
-/** @type {(template: HTMLTemplateElement) => HTMLLiElement} */
-export const cloneTemplateContent = template => template.content.cloneNode(true);
-
-/** @type {(className: string) = (container: HTMLElement) => void} */
-export const makeClosestElementByClassNameRemover = className => element => element.closest(className).remove();
-
-/** @type {<T>(fn: (param: T) => any) => (param: T) => T} */
-export const passthrough = fn => param => {
-    fn(param);
-
-    return param;
-};
-
-/** @type {(predicate: boolean) => (message: string) => void} */
-export const assert = (predicate, message) => {
-    if (!predicate) {
-        throw new Error(`Assertion error: ${message}`, { });
-    }
-};
+import { assert } from './utils';
 
 /** @type {(className: string, containerElement: HTMLElement) => HTMLElement} */
 export const getFirstElementByClassNameOrFail = (className, containerElement) => {
@@ -77,9 +45,6 @@ export const setText = text => element => {
     element.textContent = text;
 };
 
-/** @type {(value: unknown) => boolean} */
-export const isNil = value => value === null || value === undefined;
-
 /** @type {(key: string, onPress: () => void) => (evt: KeyboardEvent) => void} */
 export const makeKeydownHandler = (key, onPress) => evt => {
     if (evt.key === key) {
@@ -87,5 +52,26 @@ export const makeKeydownHandler = (key, onPress) => evt => {
     };
 };
 
-/** @type {(text: string) => boolean} */
-export const isEmptyText = text => text.trim().length === 0;
+/** @type {(container: HTMLElement) => DocumentFragment} */
+export const appendTo = container => child => container.appendChild(child);
+
+/** @type {(template: HTMLTemplateElement) => HTMLLiElement} */
+export const cloneTemplateContent = template => template.content.cloneNode(true);
+
+/** @type {(className: string) = (container: HTMLElement) => void} */
+export const makeClosestElementByClassNameRemover = className => element => element.closest(className).remove();
+
+/** @type {() => DocumentFragment} */
+export const makeFragment = () => document.createDocumentFragment();
+
+export const getFormSubmitButton = form => getFirstElementByClassNameOrFail('button', form);
+
+/**
+ * @type {(form: HTMLFormElement, elementName: string) => HTMLFormElement}
+ */
+export const getFromElementOrFail = (form, elementName) => {
+    const element = form.elements[elementName];
+    assert(element instanceof HTMLElement, `form element with name: ${elementName} not found`);
+
+    return element;
+};

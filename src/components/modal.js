@@ -1,4 +1,8 @@
-import { getFirstElementByClassNameOrFail, makeKeydownHandler } from './utils.js';
+/** see README.md about modules structure */
+import {
+    getFirstElementByClassNameOrFail,
+    makeKeydownHandler,
+} from '../utils/dom.utils.js';
 
 /** @type {(modal: HTMLElement) => void} */
 export const showModal = modal => {

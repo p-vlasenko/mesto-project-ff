@@ -1,5 +1,5 @@
-import { initFormModalHandlers } from './modal.js';
-import { isEmptyText, noop } from './utils.js';
+import { initFormModalHandlers } from '../components/modal.js';
+import { isEmptyText, noop } from '../utils/utils.js';
 
 /**
  * @typedef {object} ProfileElements
@@ -10,7 +10,7 @@ import { isEmptyText, noop } from './utils.js';
  */
 
 /**
- * @typedef {Omit<import('./utils.js').ModalFromElements, 'inputs'> & ProfileElements} ProfileWorkflowElements
+ * @typedef {Omit<import('../utils/utils.js').ModalFromElements, 'inputs'> & ProfileElements} ProfileWorkflowElements
  */
 
 /** @type {(elements: ProfileWorkflowElements) => void} */

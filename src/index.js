@@ -2,18 +2,22 @@ import './images/avatar.jpg';
 import './images/logo.svg';
 import './pages/index.css';
 
-import { initNewCardModal, initPlacesList, initialCards } from './components/cards.js';
-import { getFormOrFail, getFormSubmitButton, getFromElementOrFail } from './components/form.js';
+/** see README.md about modules structure */
 import { getModalCloseButton } from './components/modal.js';
-import { initEditProfileModal } from './components/profile.js';
+import { initialCards } from './components/card.js';
 import {
-    flow,
     getFirstElementByClassNameOrFail,
-    passthrough,
-} from './components/utils.js';
+    getFormOrFail,
+    getFormSubmitButton,
+    getFromElementOrFail,
+} from './utils/dom.utils.js';
+import { flow, passthrough } from './utils/utils.js';
+import { initNewCardModal } from './workflows/new-card-modal.js';
+import { initPlacesList } from './workflows/place-card-list.js';
+import { initEditProfileModal } from './workflows/profile-modal.js';
 
-/** @typedef {import('./components/cards.js').CardWorkflowElements} CardWorkflowElements */
-/** @typedef {import('./components/profile.js').ProfileWorkflowElements} ProfileWorkflowElements */
+/** @typedef {import('./workflows/types.js').CardWorkflowElements} CardWorkflowElements */
+/** @typedef {import('./workflows/profile-modal.js').ProfileWorkflowElements} ProfileWorkflowElements */
 
 /** @type {() => CardWorkflowElements} */
 const getCardsWorkflowElements = () => {
