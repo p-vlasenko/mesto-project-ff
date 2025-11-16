@@ -1,16 +1,13 @@
 import { initFormModalHandlers } from '../components/modal.js';
 import { makeCardElement } from '../components/card.js';
-import {
-    isEmptyText,
-    noop,
-} from '../utils/utils.js';
+import { noop } from '../utils/utils.js';
 
 /**
  * @typedef {import('./types.js').CardWorkflowElements} CardWorkflowElements
  */
 
-/** @type {(elements: CardWorkflowElements) => void} */
-export const initNewCardModal = elements => {
+/** @type {(handlers: { resetValidationErrors: (form: HTMLFormElement) => void }) => (elements: CardWorkflowElements) => void} */
+export const initNewCardModal = ({ resetValidationErrors }) => elements => {
     const {
         submitNewCardFormButton,
         placeNameInput,
@@ -21,10 +18,6 @@ export const initNewCardModal = elements => {
         addCardButton,
         closeNewCardModalButton,
     } = elements;
-
-    const newCardInputs = [placeNameInput, linkInput];
-
-    const isNewCardFormValid = () => newCardInputs.every(input => !isEmptyText(input.value));
 
     const onNewCardFromSubmit = () => {
         const newCardElement = makeCardElement({
@@ -38,7 +31,6 @@ export const initNewCardModal = elements => {
 
     initFormModalHandlers({
         elements: {
-            inputs: newCardInputs,
             submitFormButton: submitNewCardFormButton,
             form: newCardFrom,
             openModalButton: addCardButton,
@@ -46,9 +38,11 @@ export const initNewCardModal = elements => {
             closeModalButton: closeNewCardModalButton,
         },
         handlers: {
-            isFormValid: isNewCardFormValid,
             onSubmit: onNewCardFromSubmit,
-            onClose: () => newCardFrom.reset(),
+            onClose: () => {
+                newCardFrom.reset();
+                resetValidationErrors(newCardFrom);
+            },
             onOpen: noop,
         },
     });

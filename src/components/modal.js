@@ -14,18 +14,6 @@ export const closeModal = modal => {
     modal.classList.remove('popup_is-opened');
 };
 
-/** @type {(button: HTMLButtonElement) => void} */
-export const disableModalButton = button => {
-    button.classList.add('popup__button_disabled');
-    button.disabled = true;
-};
-
-/** @type {(button: HTMLButtonElement) => void} */
-export const enableModalButton = button => {
-    button.classList.remove('popup__button_disabled');
-    button.disabled = false;
-};
-
 /** @type {(modal: HTMLElement) => HTMLButtonElement} */
 export const getModalCloseButton = modal => getFirstElementByClassNameOrFail(
     'popup__close',
@@ -43,13 +31,11 @@ export const getModalCloseButton = modal => getFirstElementByClassNameOrFail(
  * @typedef {object} FromElements
  * @property {HTMLElement} submitFromButton
  * @property {HTMLElement} form
- * @property {HTMLInputElement[]} inputs
  */
 
 /**
  * @typedef {object} ModalFromHandlers
  * @property {() => void} onSubmit
- * @property {(form: HTMLFormElement) => boolean} isFormValid
  * @property {() => void} onClose
  * @property {() => void} onOpen
  */
@@ -67,33 +53,17 @@ export const getModalCloseButton = modal => getFirstElementByClassNameOrFail(
 export const initFormModalHandlers = ({ elements, handlers }) => {
     const {
         submitFormButton,
-        inputs,
-        form,
         openModalButton,
         ...popupElements
     } = elements;
 
-    const { onSubmit, isFormValid, onClose, onOpen } = handlers;
-
-    const setSubmitButtonState = () => {
-        if (isFormValid(form)) {
-            enableModalButton(submitFormButton);
-        }
-        else {
-            disableModalButton(submitFormButton);
-        }
-    };
-
-    setSubmitButtonState();
+    const { onSubmit, onClose, onOpen } = handlers;
 
     const { open, close } = initModalHandlers({
         elements: popupElements,
         handlers: {
             onClose,
-            onOpen: () => {
-                onOpen();
-                setSubmitButtonState();
-            },
+            onOpen,
         },
     });
 
@@ -106,8 +76,6 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
     };
 
     submitFormButton.addEventListener('click', handleSubmitButtonClick);
-
-    inputs.forEach(input => input.addEventListener('input', setSubmitButtonState));
 };
 
 /**

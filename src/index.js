@@ -3,8 +3,8 @@ import './images/logo.svg';
 import './pages/index.css';
 
 /** see README.md about modules structure */
-import { getModalCloseButton } from './components/modal.js';
 import { initialCards } from './components/card.js';
+import { getModalCloseButton } from './components/modal.js';
 import {
     getFirstElementByClassNameOrFail,
     getFormOrFail,
@@ -12,6 +12,7 @@ import {
     getFromElementOrFail,
 } from './utils/dom.utils.js';
 import { flow, passthrough } from './utils/utils.js';
+import { makeValidationUtils } from './utils/validation.js';
 import { initNewCardModal } from './workflows/new-card-modal.js';
 import { initPlacesList } from './workflows/place-card-list.js';
 import { initEditProfileModal } from './workflows/profile-modal.js';
@@ -41,11 +42,19 @@ const getCardsWorkflowElements = () => {
     });
 };
 
+const { enableValidation, resetValidationErrors } = makeValidationUtils({
+    inputBaseClass: 'popup__input',
+    disabledSubmitButtonClass: 'popup__button_disabled',
+    invalidInputClass: 'popup__input_type_error',
+    visibleValidationErrorClass: `popup__input-error_active`,
+    getInputErrorMessageElementClass: inputId => `${inputId}-error`,
+});
+
 /** @type {(cards: Card[]) => void} */
 const initPlaceCardsWorkflow = cards => flow(
     getCardsWorkflowElements,
     passthrough(initPlacesList(cards)),
-    initNewCardModal,
+    initNewCardModal({ resetValidationErrors }),
 )();
 
 /** @type {() => ProfileWorkflowElements} */
@@ -67,7 +76,11 @@ const getProfileWorkflowElements = () => {
 };
 
 /** @type {() => void} */
-const initProfileWorkflow = flow(getProfileWorkflowElements, initEditProfileModal);
+const initProfileWorkflow = flow(
+    getProfileWorkflowElements,
+    initEditProfileModal({ resetValidationErrors }),
+);
 
 initProfileWorkflow();
 initPlaceCardsWorkflow(initialCards);
+enableValidation();

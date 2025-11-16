@@ -1,5 +1,4 @@
 import { initFormModalHandlers } from '../components/modal.js';
-import { isEmptyText, noop } from '../utils/utils.js';
 
 /**
  * @typedef {object} ProfileElements
@@ -10,26 +9,23 @@ import { isEmptyText, noop } from '../utils/utils.js';
  */
 
 /**
- * @typedef {Omit<import('../utils/utils.js').ModalFromElements, 'inputs'> & ProfileElements} ProfileWorkflowElements
+ * @typedef {Omit<import('../components/modal.js').FromElements, 'inputs'> & ProfileElements} ProfileWorkflowElements
  */
 
-/** @type {(elements: ProfileWorkflowElements) => void} */
-export const initEditProfileModal = elements => {
+/** @type {(handlers: { resetValidationErrors: (form: HTMLFormElement) => void }) => (elements: ProfileWorkflowElements) => void} */
+export const initEditProfileModal = ({ resetValidationErrors }) => elements => {
     const {
         nameInput,
         descriptionInput,
         submitFormButton,
         profileTitleElement,
         profileDescriptionElement,
+        form,
         ...rest
     } = elements;
 
     nameInput.value = profileTitleElement.textContent;
     descriptionInput.value = profileDescriptionElement.textContent;
-
-    const inputs = [nameInput, descriptionInput];
-
-    const isFormValid = () => inputs.every(input => !isEmptyText(input.value));
 
     const onSubmit = () => {
         profileTitleElement.textContent = nameInput.value;
@@ -42,12 +38,15 @@ export const initEditProfileModal = elements => {
     };
 
     initFormModalHandlers({
-        elements: { submitFormButton, inputs, ...rest },
+        elements: {
+            form,
+            submitFormButton,
+            ...rest,
+        },
         handlers: {
-            isFormValid,
             onSubmit,
             onOpen: setInputValues,
-            onClose: noop,
+            onClose: () => resetValidationErrors(form),
         },
     });
 };
