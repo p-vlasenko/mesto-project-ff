@@ -1,5 +1,5 @@
-import { initModalHandlers } from '../components/modal.js';
 import { makeCardElement } from '../components/card.js';
+import { initModalHandlers } from '../components/modal.js';
 import {
     appendTo,
     makeClosestElementByClassNameRemover,
@@ -15,6 +15,7 @@ import {
 /**
  * @typedef {import('../components/card.js').Card} Card
  * @typedef {import('./types.js').CardWorkflowElements} CardWorkflowElements
+ * @typedef {import('../types.js').User} User
  */
 
 /** @type {(element: HTMLElement) => boolean} */
@@ -29,9 +30,24 @@ const isImage = element => element.classList.contains('card__image');
 /** @type {(element: HTMLElement) => void} */
 const removeClosestCardElement = makeClosestElementByClassNameRemover('.card');
 
-/** @type {(element: HTMLElement) => void} */
-const toggleLike = cardLikeButton => {
+/** @type {(cardLikeButton: HTMLElement) => void} */
+const toggleLikeButton = cardLikeButton => {
     cardLikeButton.classList.toggle('card__like-button_is-active');
+};
+
+/** @type {(cardLikeButton: HTMLElement) => boolean} */
+const isActiveLike = cardLikeButton => cardLikeButton.classList.contains('card__like-button_is-active');
+
+/** @type {deps: Pick<PlaceListWorkflowDeps, 'addCardLike' | 'removeCardLike'> => (element: HTMLElement) => void} */
+const makeLikeButtonHandler = ({ addCardLike, removeCardLike }) => cardLikeButton => {
+    const toggleLike = isActiveLike(cardLikeButton) ? removeCardLike : addCardLike;
+    const cardElement = cardLikeButton.closest('.card');
+    const cardId = cardElement.dataset.id;
+
+    toggleLike(cardId).then(reust => {
+        console.log('reust:', reust);
+        return toggleLikeButton(cardLikeButton);
+    });
 };
 
 const cardElement = {
@@ -64,8 +80,8 @@ const makeCardButtonClickHandler = ({ onDeleteButtonClick, onLikeButtonClick, on
         [cardElement.image]: onImageClick,
     };
 
-    const handler = cardButtonClickHandlers[getElementType(evt.target)];
-    handler?.(evt.target);
+    const handleClick = cardButtonClickHandlers[getElementType(evt.target)];
+    handleClick?.(evt.target);
 };
 
 /** @type {(handlers: CardButtonHandlers) => (cardList: HTMLElement) => void} */
@@ -74,15 +90,26 @@ const addCardButtonHandlers = handlers => cardList => {
     cardList.addEventListener('click', handleCardButtonClick);
 };
 
-/** @type {(cards: Card[]) => (cardListElement: HTMLElement) => void} */
-const addCards = cards => cardListElement => flow(
-    map(makeCardElement),
+/** @type {(cards: Card[], user: User) => (cardListElement: HTMLElement) => void} */
+const addCards = (cards, user) => cardListElement => flow(
+    map(card => makeCardElement(card, user)),
     wrapToFragment,
     appendTo(cardListElement),
 )(cards);
 
-/** @type {(cards: Card[]) => (elements: CardWorkflowElements) => void} */
-export const initPlacesList = cards => elements => {
+/**
+ * @typedef {object} PlaceListWorkflowDeps
+ * @property {User} user
+ * @property {Card[]} cards
+ * @property {(id: Card['_id']) => Promise<void>} deleteCard
+ * @property {(id: Card['_id']) => Promise<void>} addCardLike
+ * @property {(id: Card['_id']) => Promise<void>} removeCardLike
+ */
+
+/** @type {(deps: PlaceListWorkflowDeps) => (elements: CardWorkflowElements) => void} */
+export const initPlacesList = deps => elements => {
+    const { cards, user, deleteCard, addCardLike, removeCardLike } = deps;
+
     const {
         placesListElement,
         imageModal,
@@ -116,11 +143,21 @@ export const initPlacesList = cards => elements => {
         },
     });
 
+    const onDeleteButtonClick = button => {
+        const cardElement = button.closest('.card');
+        const cardId = cardElement.dataset.id;
+
+        deleteCard(cardId).then(() => void removeClosestCardElement(button));
+    };
+
     return flow(
-        passthrough(addCards(cards)),
+        passthrough(addCards(cards, user)),
         addCardButtonHandlers({
-            onDeleteButtonClick: removeClosestCardElement,
-            onLikeButtonClick: toggleLike,
+            onDeleteButtonClick,
+            onLikeButtonClick: makeLikeButtonHandler({
+                addCardLike,
+                removeCardLike,
+            }),
             onImageClick: image => {
                 initImageModalContent({ link: image.src, name: image.alt });
                 openImageModal();

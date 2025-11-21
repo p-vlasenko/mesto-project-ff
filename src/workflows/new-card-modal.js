@@ -1,13 +1,20 @@
-import { initFormModalHandlers } from '../components/modal.js';
 import { makeCardElement } from '../components/card.js';
+import { initFormModalHandlers } from '../components/modal.js';
 import { noop } from '../utils/utils.js';
 
+/** @typedef {import('./types.js').CardWorkflowElements} CardWorkflowElements */
+/** @typedef {import('../types.js').Card} Card */
+/** @typedef {import('../types.js').User} User */
+
 /**
- * @typedef {import('./types.js').CardWorkflowElements} CardWorkflowElements
+ * @typedef {import('./types.js').CardWorkflowElements} NewCardWorkflowDeps
+ * @property {User} user
+ * @property {(params: Pick<Card, 'name' | 'link'>) => Promise<Card>} addCard
+ * @property {(form: HTMLFormElement) => void} resetValidationErrors
  */
 
-/** @type {(handlers: { resetValidationErrors: (form: HTMLFormElement) => void }) => (elements: CardWorkflowElements) => void} */
-export const initNewCardModal = ({ resetValidationErrors }) => elements => {
+/** @type {(deps: { resetValidationErrors: (form: HTMLFormElement) => void }) => (elements: CardWorkflowElements) => void} */
+export const initNewCardModal = ({ resetValidationErrors, addCard, user }) => elements => {
     const {
         submitNewCardFormButton,
         placeNameInput,
@@ -19,15 +26,15 @@ export const initNewCardModal = ({ resetValidationErrors }) => elements => {
         closeNewCardModalButton,
     } = elements;
 
-    const onNewCardFromSubmit = () => {
-        const newCardElement = makeCardElement({
+    const onSubmit = () =>
+        addCard({
             name: placeNameInput.value,
             link: linkInput.value,
+        }).then(card => {
+            const newCardElement = makeCardElement(card, user);
+            placesListElement.prepend(newCardElement);
+            newCardFrom.reset();
         });
-
-        placesListElement.prepend(newCardElement);
-        newCardFrom.reset();
-    };
 
     initFormModalHandlers({
         elements: {
@@ -38,7 +45,7 @@ export const initNewCardModal = ({ resetValidationErrors }) => elements => {
             closeModalButton: closeNewCardModalButton,
         },
         handlers: {
-            onSubmit: onNewCardFromSubmit,
+            onSubmit,
             onClose: () => {
                 newCardFrom.reset();
                 resetValidationErrors(newCardFrom);

@@ -3,7 +3,9 @@ import './images/logo.svg';
 import './pages/index.css';
 
 /** see README.md about modules structure */
-import { initialCards } from './components/card.js';
+import { makeCardsApi } from './api/cards-api.js';
+import { AUTH_TOKEN, BASE_URL } from './api/constants.js';
+import { makeUserApi } from './api/user-api.js';
 import { getModalCloseButton } from './components/modal.js';
 import {
     getFirstElementByClassNameOrFail,
@@ -19,6 +21,8 @@ import { initEditProfileModal } from './workflows/profile-modal.js';
 
 /** @typedef {import('./workflows/types.js').CardWorkflowElements} CardWorkflowElements */
 /** @typedef {import('./workflows/profile-modal.js').ProfileWorkflowElements} ProfileWorkflowElements */
+/** @typedef {import('./api/user-api.js').UserApi} UserApi */
+/** @typedef {import('./workflows/place-card-list.js').PlaceListWorkflowDeps} PlaceListWorkflowDeps */
 
 /** @type {() => CardWorkflowElements} */
 const getCardsWorkflowElements = () => {
@@ -50,11 +54,11 @@ const { enableValidation, resetValidationErrors } = makeValidationUtils({
     getInputErrorMessageElementClass: inputId => `${inputId}-error`,
 });
 
-/** @type {(cards: Card[]) => void} */
-const initPlaceCardsWorkflow = cards => flow(
+/** @type {(deps: PlaceListWorkflowDeps) => void} */
+const initPlaceCardsWorkflow = deps => flow(
     getCardsWorkflowElements,
-    passthrough(initPlacesList(cards)),
-    initNewCardModal({ resetValidationErrors }),
+    passthrough(initPlacesList(deps)),
+    initNewCardModal(deps),
 )();
 
 /** @type {() => ProfileWorkflowElements} */
@@ -72,15 +76,48 @@ const getProfileWorkflowElements = () => {
         submitFormButton: getFormSubmitButton(form),
         profileTitleElement: getFirstElementByClassNameOrFail('profile__title', document),
         profileDescriptionElement: getFirstElementByClassNameOrFail('profile__description', document),
+        profileImageElement: getFirstElementByClassNameOrFail('profile__image', document),
     });
 };
 
-/** @type {() => void} */
-const initProfileWorkflow = flow(
-    getProfileWorkflowElements,
-    initEditProfileModal({ resetValidationErrors }),
-);
+/**
+ * @typedef {object} ProfileWorkflowDeps
+ * @property {User} user
+ * @property {UserApi['updateUser']} updateUser
+ * @property {(form: HTMLFormElement) => void} resetValidationErrors
+ */
 
-initProfileWorkflow();
-initPlaceCardsWorkflow(initialCards);
+/** @type {(deps: ProfileWorkflowDeps) => void} */
+const initProfileWorkflow = ({ user, updateUser }) => flow(
+    getProfileWorkflowElements,
+    initEditProfileModal({
+        user,
+        resetValidationErrors,
+        updateUser,
+    }),
+)();
+
+const { getUser, updateUser } = makeUserApi({
+    baseUrl: BASE_URL,
+    authToken: AUTH_TOKEN,
+});
+
+const { getCards, addCard, deleteCard, addCardLike, removeCardLike } = makeCardsApi({
+    baseUrl: BASE_URL,
+    authToken: AUTH_TOKEN,
+});
+
 enableValidation();
+
+await Promise.all([getUser(), getCards()]).then(([user, cards]) => {
+    initProfileWorkflow({ user, updateUser, resetValidationErrors });
+    initPlaceCardsWorkflow({
+        user,
+        cards,
+        resetValidationErrors,
+        addCard,
+        deleteCard,
+        addCardLike,
+        removeCardLike,
+    });
+});

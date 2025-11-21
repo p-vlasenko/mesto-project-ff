@@ -55,8 +55,11 @@ export const makeKeydownHandler = (key, onPress) => evt => {
 /** @type {(container: HTMLElement) => DocumentFragment} */
 export const appendTo = container => child => container.appendChild(child);
 
-/** @type {(template: HTMLTemplateElement) => HTMLLiElement} */
+/** @type {(template: HTMLTemplateElement) => DocumentFragment} */
 export const cloneTemplateContent = template => template.content.cloneNode(true);
+
+/** @type {(fragment: DocumentFragment) => DocumentFragment} */
+export const getFirstChild = fragment => fragment.firstElementChild;
 
 /** @type {(className: string) = (container: HTMLElement) => void} */
 export const makeClosestElementByClassNameRemover = className => element => element.closest(className).remove();

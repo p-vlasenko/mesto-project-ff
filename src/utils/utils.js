@@ -13,6 +13,9 @@ export const passthrough = fn => param => {
     return param;
 };
 
+/** @type {<T, U>(predicate: (param: T) => boolean, fn: (param: T) => U) => (param: T) => T | U} */
+export const when = (predicate, fn) => param => predicate(param) ? fn(param) : param;
+
 /** @type {(predicate: boolean) => (message: string) => void} */
 export const assert = (predicate, message) => {
     if (!predicate) {
