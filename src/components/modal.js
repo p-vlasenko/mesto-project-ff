@@ -29,7 +29,7 @@ export const getModalCloseButton = modal => getFirstElementByClassNameOrFail(
 
 /**
  * @typedef {object} FromElements
- * @property {HTMLElement} submitFromButton
+ * @property {HTMLElement} submitFormButton
  * @property {HTMLElement} form
  */
 
@@ -71,8 +71,7 @@ export const initFormModalHandlers = ({ elements, handlers }) => {
 
     const handleSubmitButtonClick = evt => {
         evt.preventDefault();
-        onSubmit();
-        close();
+        Promise.resolve(onSubmit()).finally(close);
     };
 
     submitFormButton.addEventListener('click', handleSubmitButtonClick);

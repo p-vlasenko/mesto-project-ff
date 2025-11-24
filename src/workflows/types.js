@@ -12,6 +12,9 @@
  * @property {HTMLElement} imageModalTitleElement
  * @property {HTMLElement} cardImage
  * @property {HTMLElement} placesListElement
+ * @property {HTMLElement} deleteCardModal
+ * @property {HTMLElement} closeDeleteCardModalButton
+ * @property {HTMLElement} deleteCardConfirmButton
  */
 
 export default {};

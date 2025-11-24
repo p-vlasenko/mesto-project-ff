@@ -1,16 +1,19 @@
-import { makeCardElement } from '../components/card.js';
+import { getCardLikeNumberElement, makeCardElement } from '../components/card.js';
 import { initModalHandlers } from '../components/modal.js';
 import {
     appendTo,
-    makeClosestElementByClassNameRemover,
+    findElementByDatasetId,
     wrapToFragment,
 } from '../utils/dom.utils.js';
 import {
     flow,
+    increment,
+    decrement,
     map,
     noop,
     passthrough,
 } from '../utils/utils.js';
+import { DEFAULT_CONFIRM_BUTTON_TEXT, DELETION_TEXT } from './constants.js';
 
 /**
  * @typedef {import('../components/card.js').Card} Card
@@ -27,9 +30,6 @@ const isLikeButton = element => element.classList.contains('card__like-button');
 /** @type {(element: HTMLElement) => boolean} */
 const isImage = element => element.classList.contains('card__image');
 
-/** @type {(element: HTMLElement) => void} */
-const removeClosestCardElement = makeClosestElementByClassNameRemover('.card');
-
 /** @type {(cardLikeButton: HTMLElement) => void} */
 const toggleLikeButton = cardLikeButton => {
     cardLikeButton.classList.toggle('card__like-button_is-active');
@@ -38,16 +38,25 @@ const toggleLikeButton = cardLikeButton => {
 /** @type {(cardLikeButton: HTMLElement) => boolean} */
 const isActiveLike = cardLikeButton => cardLikeButton.classList.contains('card__like-button_is-active');
 
-/** @type {deps: Pick<PlaceListWorkflowDeps, 'addCardLike' | 'removeCardLike'> => (element: HTMLElement) => void} */
+/** @type {(deps: Pick<PlaceListWorkflowDeps, 'addCardLike' | 'removeCardLike'>) => (element: HTMLElement) => void} */
 const makeLikeButtonHandler = ({ addCardLike, removeCardLike }) => cardLikeButton => {
     const toggleLike = isActiveLike(cardLikeButton) ? removeCardLike : addCardLike;
+    const getLikeNumber = isActiveLike(cardLikeButton) ? decrement : increment;
     const cardElement = cardLikeButton.closest('.card');
-    const cardId = cardElement.dataset.id;
+    const cardId = cardElement?.dataset?.id;
 
-    toggleLike(cardId).then(reust => {
-        console.log('reust:', reust);
-        return toggleLikeButton(cardLikeButton);
-    });
+    if (!cardId) {
+        return;
+    }
+
+    const cardLikeNumberElement = getCardLikeNumberElement(cardElement);
+
+    toggleLike(cardId)
+        .then(() => {
+            toggleLikeButton(cardLikeButton);
+            cardLikeNumberElement.textContent = getLikeNumber(+cardLikeNumberElement.textContent).toString();
+        })
+        .catch(err => console.error('Toggle like failed', err));
 };
 
 const cardElement = {
@@ -65,6 +74,12 @@ const getElementType = element =>
     isImage(element) ? cardElement.image :
     UNKNOWN_BUTTON_TYPE;
 
+/** @type {(evt: Event) => (evt: PointerEvent) => Element|null} */
+const findCardButtonFromEvent = evt =>
+    evt.target instanceof Element
+        ? evt.target.closest('.card__delete-button, .card__like-button, .card__image')
+        : null;
+
 /**
  * @typedef {object} CardButtonHandlers
  * @property {(button: HTMLElement) => void} onLikeButtonClick
@@ -74,14 +89,21 @@ const getElementType = element =>
 
 /** @type {(handlers: CardButtonHandlers) => (evt: PointerEvent) => void} */
 const makeCardButtonClickHandler = ({ onDeleteButtonClick, onLikeButtonClick, onImageClick }) => evt => {
+    const target = findCardButtonFromEvent(evt);
+
+    if (!target) {
+        return;
+    }
+
     const cardButtonClickHandlers = {
         [cardElement.deleteButton]: onDeleteButtonClick,
         [cardElement.likeButton]: onLikeButtonClick,
         [cardElement.image]: onImageClick,
     };
 
-    const handleClick = cardButtonClickHandlers[getElementType(evt.target)];
-    handleClick?.(evt.target);
+    const type = getElementType(target);
+    const handleClick = cardButtonClickHandlers[type];
+    handleClick?.(target);
 };
 
 /** @type {(handlers: CardButtonHandlers) => (cardList: HTMLElement) => void} */
@@ -116,6 +138,9 @@ export const initPlacesList = deps => elements => {
         closeImageModalButton,
         imageModalImage,
         imageModalTitleElement,
+        deleteCardModal,
+        closeDeleteCardModalButton,
+        deleteCardConfirmButton,
     } = elements;
 
     /** @type {() => void} */
@@ -143,11 +168,53 @@ export const initPlacesList = deps => elements => {
         },
     });
 
-    const onDeleteButtonClick = button => {
-        const cardElement = button.closest('.card');
-        const cardId = cardElement.dataset.id;
+    /** @type {string|undefined} */
+    let cardIdToDelete;
 
-        deleteCard(cardId).then(() => void removeClosestCardElement(button));
+    const resetCardToDelete = () => void (cardIdToDelete = undefined);
+
+    /** @type {(id: string) => void} */
+    const removeDeletedCardElement = id => {
+        const cardElement = findElementByDatasetId(id);
+        cardElement?.remove();
+    };
+
+    const {
+        open: openDeleteCardModal,
+        close: closeDeleteCardModal,
+    } = initModalHandlers({
+        elements: {
+            modal: deleteCardModal,
+            closeModalButton: closeDeleteCardModalButton,
+        },
+        handlers: {
+            onClose: resetCardToDelete,
+            onOpen: noop,
+        },
+    });
+
+    deleteCardConfirmButton.addEventListener('click', () => {
+        if (!cardIdToDelete) {
+            return;
+        };
+
+        deleteCardConfirmButton.textContent = DELETION_TEXT;
+
+        deleteCard(cardIdToDelete)
+            .then(removeDeletedCardElement)
+            .finally(() => {
+                resetCardToDelete();
+                closeDeleteCardModal();
+                deleteCardConfirmButton.textContent = DEFAULT_CONFIRM_BUTTON_TEXT;
+            });
+    });
+
+    /** @type {(button: HTMLElement) => string} */
+    const getDeletedCardId = button => button.closest('.card')?.dataset.id;
+
+    const onDeleteButtonClick = button => {
+        openDeleteCardModal();
+        cardIdToDelete = getDeletedCardId(button);
     };
 
     return flow(

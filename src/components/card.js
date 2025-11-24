@@ -20,7 +20,14 @@ const getCardImageElement = cardElement => getFirstElementByClassNameOrFail('car
 const getCardTitleElement = cardElement => getFirstElementByClassNameOrFail('card__title', cardElement);
 
 /** @type {(cardElement: HTMLElement) => HTMLElement} */
+export const getCardLikeNumberElement = cardElement =>
+    getFirstElementByClassNameOrFail('card__like-count', cardElement);
+
+/** @type {(cardElement: HTMLElement) => HTMLElement} */
 const getDeleteCardButton = cardElement => getFirstElementByClassNameOrFail('card__delete-button', cardElement);
+
+/** @type {(cardElement: HTMLElement) => HTMLElement} */
+const getCardLikeButton = cardElement => getFirstElementByClassNameOrFail('card__like-button', cardElement);
 
 /** @type {(card: Card) => (cardElement: HTMLElement) => void} */
 const setCardImageAttributes = ({ name, link }) => flow(
@@ -31,6 +38,9 @@ const setCardImageAttributes = ({ name, link }) => flow(
 /** @type {(title: string) => (cardElement: HTMLElement) => void} */
 const setCardTitle = title => flow(getCardTitleElement, setText(title));
 
+/** @type {(num: number) => (cardElement: HTMLElement) => void} */
+const setCardLikeNumber = num => flow(getCardLikeNumberElement, setText(num.toString()));
+
 /** @type {(id: string) => (cardElement: HTMLElement) => void} */
 const setCardId = id => cardElement => void (cardElement.dataset.id = id);
 
@@ -40,6 +50,22 @@ const hideDeleteButton = button => {
     button.classList.add('card__delete-button_disabled');
 };
 
+/** @type {(button: HTMLElement) => void} */
+const activateLikeButton = button => {
+    button.classList.add('card__like-button_is-active');
+};
+
+/** @type {(button: HTMLElement) => void} */
+const deactivateLikeButton = button => {
+    button.classList.remove('card__like-button_is-active');
+};
+
+/** @type {(isActive: boolean) => (cardElement: HTMLElement) => void} */
+const setLikeButtonState = isActive => cardElement => {
+    const setState = isActive ? activateLikeButton : deactivateLikeButton;
+    return flow(getCardLikeButton, setState)(cardElement);
+};
+
 /** @type {(cardElement: HTMLElement) => void} */
 const hideCardDeleteButton = flow(
     getDeleteCardButton,
@@ -47,12 +73,18 @@ const hideCardDeleteButton = flow(
 );
 
 /** @type {(card: Card, user: { _id: string }) => HTMLElement} */
-export const makeCardElement = (card, user) => flow(
-    getCardTemplate,
-    cloneTemplateContent,
-    getFirstChild,
-    passthrough(setCardId(card._id)),
-    passthrough(setCardImageAttributes(card)),
-    passthrough(setCardTitle(card.name)),
-    passthrough(when(() => card.owner._id !== user._id, hideCardDeleteButton)),
-)();
+export const makeCardElement = (card, user) => {
+    const isLiked = card.likes.find(it => it._id === user._id) !== undefined;
+
+    return flow(
+        getCardTemplate,
+        cloneTemplateContent,
+        getFirstChild,
+        passthrough(setCardId(card._id)),
+        passthrough(setCardImageAttributes(card)),
+        passthrough(setCardTitle(card.name)),
+        passthrough(setCardLikeNumber(card.likes.length)),
+        passthrough(setLikeButtonState(isLiked)),
+        passthrough(when(() => card.owner._id !== user._id, hideCardDeleteButton)),
+    )();
+};
