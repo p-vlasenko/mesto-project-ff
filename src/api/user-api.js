@@ -1,4 +1,8 @@
-import { HEADERS, CONTENT_TYPE, HTTP_METHOD } from './constants.js';
+import {
+    makeGetRequestParams,
+    makePatchRequestParamsFactory,
+    parseSuccessfulResponse,
+} from './utils.js';
 
 /** @typedef {import('../types.js').User} User */
 /** @typedef {import('../types.js').UpdateUserParams} UpdateUserParams */
@@ -13,45 +17,46 @@ import { HEADERS, CONTENT_TYPE, HTTP_METHOD } from './constants.js';
  * @typedef {object} UserApi
  * @property {() => Promise<User>} getUser
  * @property {(params: UpdateUserParams) => Promise<User>} updateUser
+ * @property {(url: string) => Promise<string>} updateAvatar
  */
 
 /** @type {(params: UserApiParams) => UserApi} */
 const makeUserApi = ({ baseUrl, authToken }) => {
+    const makePatchRequestParams = makePatchRequestParamsFactory(authToken);
+
     /** @type {UserApi['getUser']} */
-    const getUser = () => {
-        return fetch(`${baseUrl}/users/me`, {
-            method: HTTP_METHOD.GET,
-            headers: {
-                [HEADERS.AUTH]: authToken,
-            },
-        }).then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            else {
-                return Promise.reject(new Error('GET me request returns not ok status:', res.statusCode));
-            }
-        }).catch(err => void console.error(err));
-    };
+    const getUser = () =>
+        fetch(
+            `${baseUrl}/users/me`,
+            makeGetRequestParams(authToken),
+        ).then(
+            parseSuccessfulResponse(status => `GET user request returns not ok status: ${status}`),
+        );
 
     /** @type {UserApi['updateUser']} */
-    const updateUser = params => {
-        return fetch(`${baseUrl}/users/me`, {
-            method: HTTP_METHOD.PATCH,
-            headers: {
-                [HEADERS.AUTH]: authToken,
-                [HEADERS.CONTENT_TYPE]: CONTENT_TYPE.JSON,
-            },
-            body: JSON.stringify(params),
-        }).then(res => res.ok
-            ? res.json()
-            : Promise.reject(new Error('GET me request returns not ok status:', res.statusCode)),
-        ).catch(err => void console.error(err));
-    };
+    const updateUser = params =>
+        fetch(
+            `${baseUrl}/users/me`,
+            makePatchRequestParams(params),
+        ).then(
+            parseSuccessfulResponse(status => `PATCH user request returns not ok status: ${status}`),
+        );
+
+    /** @type {UserApi['updateUser']} */
+    const updateAvatar = url =>
+        fetch(
+            `${baseUrl}/users/me/avatar`,
+            makePatchRequestParams({ avatar: url }),
+        ).then(
+            parseSuccessfulResponse(status => `PATCH avatar request returns not ok status: ${status}`),
+        ).then(
+            user => user.avatar,
+        );
 
     return {
         getUser,
         updateUser,
+        updateAvatar,
     };
 };
 

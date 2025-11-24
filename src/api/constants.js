@@ -20,6 +20,14 @@ export const CONTENT_TYPE = {
     JSON: 'application/json',
 };
 
+export const authHeader = {
+    [HEADERS.AUTH]: AUTH_TOKEN,
+};
+
+export const jsonContentHeader = {
+    [HEADERS.CONTENT_TYPE]: CONTENT_TYPE.JSON,
+};
+
 /**
  * @typedef {object} User
  * @property {string} name
