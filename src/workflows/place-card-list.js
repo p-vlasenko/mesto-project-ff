@@ -202,6 +202,7 @@ export const initPlacesList = deps => elements => {
 
         deleteCard(cardIdToDelete)
             .then(() => removeDeletedCardElement(cardIdToDelete))
+            .catch(err => console.error('Card deletion failed', err))
             .finally(() => {
                 resetCardToDelete();
                 closeDeleteCardModal();

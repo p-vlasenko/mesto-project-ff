@@ -53,6 +53,7 @@ export const initAvatarEditModal = deps => elements => {
 
         return updateAvatar(avatarImageInput.value)
             .then(setAvatarImage)
+            .catch(err => console.error('Avatar update failed', err))
             .finally(() => void (submitFormButton.textContent = DEFAULT_SAVE_BUTTON_TEXT));
     };
 
