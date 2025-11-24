@@ -37,7 +37,7 @@ export const initNewCardModal = ({ resetValidationErrors, addCard, user }) => el
             const newCardElement = makeCardElement(card, user);
             placesListElement.prepend(newCardElement);
             newCardFrom.reset();
-        }).cath(
+        }).catch(
             err => console.error('Card adding failed', err),
         ).finally(() => {
             submitNewCardFormButton.textContent = DEFAULT_SAVE_BUTTON_TEXT;
