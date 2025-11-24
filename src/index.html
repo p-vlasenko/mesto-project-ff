@@ -14,11 +14,12 @@
   </header>
   <main class="content">
     <section class="profile page__section">
-      <div class="profile__image" ></div>
+      <div class="profile__image" >
+      </div>
       <div class="profile__info">
-        <h1 class="profile__title">Жак-Ив Кусто</h1>
+        <h1 class="profile__title">Загрузка...</h1>
         <button class="profile__edit-button" type="button"></button>
-        <p class="profile__description">Исследователь океана</p>
+        <p class="profile__description">Загрузка...</p>
       </div>
       <button class="profile__add-button" type="button"></button>
     </section>
@@ -50,9 +51,30 @@
           required
         >
         <span class="person-name-input-error popup__input-error"></span>
-        <input id="person-description-input" type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" minlength="2" maxlength="200" pattern="^[a-zA-Zа-яёЁА-Я\s\-]+$" required>
+        <input
+          id="person-description-input"
+          type="text"
+          name="description"
+          class="popup__input popup__input_type_description"
+          placeholder="Занятие"
+          minlength="2"
+          maxlength="200"
+          pattern="^[a-zA-Zа-яёЁА-Я\s\-]+$"
+          required
+        >
         <span class="person-description-input-error popup__input-error"></span>
         <button type="submit" class="button popup__button">Сохранить</button>
+      </form>
+    </div>
+  </div>
+  <div class="popup popup_type_edit-avatar">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Обновить аватар</h3>
+      <form class="popup__form" name="edit-avatar">
+        <input id="avatar-image-link-input" type="url" name="avatar-link" class="popup__input popup__input_type_url" placeholder="http://somewebsite.com/someimage.jpeg" required>
+        <span class="avatar-image-link-input-error popup__input-error"></span>
+        <button type="submit" class="button popup__button popup__button_disabled" disabled>Сохранить</button>
       </form>
     </div>
   </div>
@@ -76,6 +98,13 @@
       <p class="popup__caption"></p>
     </div>
   </div>
+  <div class="popup popup_type_delete-card">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Вы уверены?</h3>
+      <button type="submit" class="button popup__button">Да</button>
+    </div>
+  </div>
 </div>
 <template id="card-template">
   <li class="places__item card">
@@ -83,7 +112,10 @@
     <button type="button" class="card__delete-button"></button>
     <div class="card__description">
       <h2 class="card__title"></h2>
-      <button type="button" class="card__like-button"></button>
+      <div class="card__like-wrapper">
+        <button type="button" class="card__like-button"></button>
+        <span class="card__like-count">0</span>
+      </div>
     </div>
   </li>
 </template>
