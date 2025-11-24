@@ -1,4 +1,10 @@
 import { initFormModalHandlers } from '../components/modal.js';
+import { DEFAULT_SAVE_BUTTON_TEXT, SAVING_TEXT } from './constants.js';
+
+/**
+ * @typedef {import('../components/modal.js').FromElements} FromElements
+ * @typedef {import('../components/modal.js').ModalElements} ModalElements
+ */
 
 /**
  * @typedef {object} ProfileElements
@@ -6,11 +12,10 @@ import { initFormModalHandlers } from '../components/modal.js';
  * @property {HTMLInputElement} descriptionInput
  * @property {HTMLElement} profileTitleElement
  * @property {HTMLElement} profileDescriptionElement
- * @property {HTMLElement} profileImageElement
  */
 
 /**
- * @typedef {Omit<import('../components/modal.js').FromElements, 'inputs'> & ProfileElements} ProfileWorkflowElements
+ * @typedef {FromElements & ModalElements & ProfileElements} ProfileWorkflowElements
  */
 
 /** @typedef {import('../types.js').User} User */
@@ -20,20 +25,22 @@ import { initFormModalHandlers } from '../components/modal.js';
  * @typedef {object} ProfileFlowDeps
  * @property {User} user
  * @property {(form: HTMLFormElement) => void} resetValidationErrors
- * @property {(params: UpdateUserParams) => User} updateUser
+ * @property {(params: UpdateUserParams) => Promise<User>} updateUser
+ * @property {(button: HTMLElement) => void} disableButton
  */
 
 /** @type {(params: ProfileFlowDeps) => (elements: ProfileWorkflowElements) => void} */
-export const initEditProfileModal = ({ user, updateUser, resetValidationErrors }) => elements => {
+export const initEditProfileModal = deps => elements => {
+    const { user, updateUser, resetValidationErrors, disableButton } = deps;
+
     const {
         nameInput,
         descriptionInput,
-        submitFormButton,
         profileTitleElement,
         profileDescriptionElement,
-        profileImageElement,
         form,
-        ...rest
+        submitFormButton,
+        ...fromModalElements
     } = elements;
 
     profileTitleElement.textContent = user.name;
@@ -49,26 +56,30 @@ export const initEditProfileModal = ({ user, updateUser, resetValidationErrors }
     });
 
     /** @type {(updatedUser: User) => void} */
-    const serUserData = updatedUser => {
-        user = updatedUser;
+    const setUserData = updatedUser => {
         profileTitleElement.textContent = updatedUser.name;
         profileDescriptionElement.textContent = updatedUser.about;
     };
 
     /** @type {() => Promise<void>} */
-    const onSubmit = () => updateUser(getUserParams()).then(serUserData);
+    const onSubmit = () => {
+        submitFormButton.textContent = SAVING_TEXT;
+        submitFormButton.disabled = true;
+
+        return updateUser(getUserParams())
+            .then(setUserData)
+            .catch(err => console.error('Error updating user profile:', err))
+            .finally(() => void (submitFormButton.textContent = DEFAULT_SAVE_BUTTON_TEXT));
+    };
 
     const setInputValues = () => {
+        disableButton(submitFormButton);
         nameInput.value = profileTitleElement.textContent;
         descriptionInput.value = profileDescriptionElement.textContent;
     };
 
     initFormModalHandlers({
-        elements: {
-            form,
-            submitFormButton,
-            ...rest,
-        },
+        elements: { form, submitFormButton, ...fromModalElements },
         handlers: {
             onSubmit,
             onOpen: setInputValues,
