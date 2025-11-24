@@ -28,3 +28,9 @@ export const isNil = value => value === null || value === undefined;
 
 /** @type {(text: string) => boolean} */
 export const isEmptyText = text => text.trim().length === 0;
+
+/** @type {(n: number) => number} */
+export const increment = num => num + 1;
+
+/** @type {(n: number) => number} */
+export const decrement = num => num - 1;

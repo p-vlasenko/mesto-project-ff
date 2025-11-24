@@ -67,7 +67,11 @@ export const makeClosestElementByClassNameRemover = className => element => elem
 /** @type {() => DocumentFragment} */
 export const makeFragment = () => document.createDocumentFragment();
 
-export const getFormSubmitButton = form => getFirstElementByClassNameOrFail('button', form);
+/** @type {(container: HTMLElement) => HTMLElement} */
+export const getButton = container => getFirstElementByClassNameOrFail('button', container);
+
+/** @type {(id: string) => HTMLElement} */
+export const findElementByDatasetId = id => document.querySelector(`[data-id="${CSS.escape(String(id))}"]`);
 
 /**
  * @type {(form: HTMLFormElement, elementName: string) => HTMLFormElement}
