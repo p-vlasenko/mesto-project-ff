@@ -81,17 +81,23 @@ export const makeValidationUtils = ({
         });
     };
 
-    /** @type {(inputs: HTMLInputElement[], button: HTMLButtonElement) => string} */
-    const toggleButtonState = (inputs, submitButton) => {
-        if (hasInvalidInput(inputs)) {
-            submitButton.disabled = true;
-            submitButton.classList.add(disabledSubmitButtonClass);
-        }
-        else {
-            submitButton.disabled = false;
-            submitButton.classList.remove(disabledSubmitButtonClass);
-        }
+    /** @type {(button: HTMLButtonElement) => void} */
+    const disableButton = button => {
+        button.disabled = true;
+        button.classList.add(disabledSubmitButtonClass);
     };
+
+    /** @type {(button: HTMLButtonElement) => void} */
+    const enableButton = button => {
+        button.disabled = false;
+        button.classList.remove(disabledSubmitButtonClass);
+    };
+
+    /** @type {(inputs: HTMLInputElement[], button: HTMLButtonElement) => string} */
+    const toggleButtonState = (inputs, submitButton) =>
+        hasInvalidInput(inputs)
+            ? void disableButton(submitButton)
+            : void enableButton(submitButton);
 
     /** @type {ValidationUtils['enableValidation']} */
     const enableValidation = () => {
@@ -106,6 +112,9 @@ export const makeValidationUtils = ({
     };
 
     return {
+        disableButton,
+        enableButton,
+        toggleButtonState,
         enableValidation,
         resetValidationErrors,
     };
