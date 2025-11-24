@@ -201,7 +201,7 @@ export const initPlacesList = deps => elements => {
         deleteCardConfirmButton.textContent = DELETION_TEXT;
 
         deleteCard(cardIdToDelete)
-            .then(removeDeletedCardElement)
+            .then(() => removeDeletedCardElement(cardIdToDelete))
             .finally(() => {
                 resetCardToDelete();
                 closeDeleteCardModal();
