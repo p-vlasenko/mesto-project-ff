@@ -1,5 +1,5 @@
 import { initFormModalHandlers } from '../components/modal.js';
-import { DEFAULT_SAVE_BUTTON_TEXT, SAVING_TEXT } from './constants.js';
+import { SAVING_TEXT } from './constants.js';
 
 /**
  * @typedef {import('../components/modal.js').FromElements} FromElements
@@ -49,12 +49,14 @@ export const initAvatarEditModal = deps => elements => {
 
     /** @type {() => Promise<void>} */
     const onSubmit = () => {
+        const buttonText = submitFormButton.textContent;
         submitFormButton.textContent = SAVING_TEXT;
+        submitFormButton.disabled = true;
 
         return updateAvatar(avatarImageInput.value)
             .then(setAvatarImage)
             .catch(err => console.error('Avatar update failed', err))
-            .finally(() => void (submitFormButton.textContent = DEFAULT_SAVE_BUTTON_TEXT));
+            .finally(() => void (submitFormButton.textContent = buttonText));
     };
 
     const setInputValues = () => {

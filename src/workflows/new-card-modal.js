@@ -1,7 +1,7 @@
 import { makeCardElement } from '../components/card.js';
 import { initFormModalHandlers } from '../components/modal.js';
 import { noop } from '../utils/utils.js';
-import { DEFAULT_SAVE_BUTTON_TEXT, SAVING_TEXT } from './constants.js';
+import { SAVING_TEXT } from './constants.js';
 
 /** @typedef {import('./types.js').CardWorkflowElements} CardWorkflowElements */
 /** @typedef {import('../types.js').Card} Card */
@@ -28,7 +28,9 @@ export const initNewCardModal = ({ resetValidationErrors, addCard, user }) => el
     } = elements;
 
     const onSubmit = () => {
+        const buttonText = submitNewCardFormButton.textContent;
         submitNewCardFormButton.textContent = SAVING_TEXT;
+        submitNewCardFormButton.disabled = true;
 
         return addCard({
             name: placeNameInput.value,
@@ -40,7 +42,7 @@ export const initNewCardModal = ({ resetValidationErrors, addCard, user }) => el
         }).catch(
             err => console.error('Card adding failed', err),
         ).finally(() => {
-            submitNewCardFormButton.textContent = DEFAULT_SAVE_BUTTON_TEXT;
+            submitNewCardFormButton.textContent = buttonText;
         });
     };
 

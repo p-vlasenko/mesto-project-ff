@@ -1,5 +1,5 @@
 import { initFormModalHandlers } from '../components/modal.js';
-import { DEFAULT_SAVE_BUTTON_TEXT, SAVING_TEXT } from './constants.js';
+import { SAVING_TEXT } from './constants.js';
 
 /**
  * @typedef {import('../components/modal.js').FromElements} FromElements
@@ -63,13 +63,14 @@ export const initEditProfileModal = deps => elements => {
 
     /** @type {() => Promise<void>} */
     const onSubmit = () => {
+        const buttonText = submitFormButton.textContent;
         submitFormButton.textContent = SAVING_TEXT;
         submitFormButton.disabled = true;
 
         return updateUser(getUserParams())
             .then(setUserData)
             .catch(err => console.error('Error updating user profile:', err))
-            .finally(() => void (submitFormButton.textContent = DEFAULT_SAVE_BUTTON_TEXT));
+            .finally(() => void (submitFormButton.textContent = buttonText));
     };
 
     const setInputValues = () => {

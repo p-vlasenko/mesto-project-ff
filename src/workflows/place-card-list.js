@@ -6,14 +6,14 @@ import {
     wrapToFragment,
 } from '../utils/dom.utils.js';
 import {
+    decrement,
     flow,
     increment,
-    decrement,
     map,
     noop,
     passthrough,
 } from '../utils/utils.js';
-import { DEFAULT_CONFIRM_BUTTON_TEXT, DELETION_TEXT } from './constants.js';
+import { DELETION_TEXT } from './constants.js';
 
 /**
  * @typedef {import('../components/card.js').Card} Card
@@ -50,13 +50,17 @@ const makeLikeButtonHandler = ({ addCardLike, removeCardLike }) => cardLikeButto
     }
 
     const cardLikeNumberElement = getCardLikeNumberElement(cardElement);
+    cardLikeButton.disabled = true;
 
     toggleLike(cardId)
         .then(() => {
             toggleLikeButton(cardLikeButton);
             cardLikeNumberElement.textContent = getLikeNumber(+cardLikeNumberElement.textContent).toString();
         })
-        .catch(err => console.error('Toggle like failed', err));
+        .catch(err => console.error('Toggle like failed', err))
+        .finally(() => {
+            cardLikeButton.disabled = false;
+        });
 };
 
 const cardElement = {
@@ -198,7 +202,9 @@ export const initPlacesList = deps => elements => {
             return;
         };
 
+        const buttonText = deleteCardConfirmButton.textContent;
         deleteCardConfirmButton.textContent = DELETION_TEXT;
+        deleteCardConfirmButton.disabled = true;
 
         deleteCard(cardIdToDelete)
             .then(() => removeDeletedCardElement(cardIdToDelete))
@@ -206,7 +212,8 @@ export const initPlacesList = deps => elements => {
             .finally(() => {
                 resetCardToDelete();
                 closeDeleteCardModal();
-                deleteCardConfirmButton.textContent = DEFAULT_CONFIRM_BUTTON_TEXT;
+                deleteCardConfirmButton.textContent = buttonText;
+                deleteCardConfirmButton.disabled = false;
             });
     });
 
