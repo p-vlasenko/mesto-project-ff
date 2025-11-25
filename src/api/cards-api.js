@@ -20,52 +20,35 @@ import {
 
 /** @type {(config: ApiConfig) => CardsApi} */
 const makeCardsApi = ({ baseUrl, authToken }) => {
+    const cardsUrl = `${baseUrl}/cards`;
+    const likesUrl = `${cardsUrl}/likes`;
+
     const makePostRequestParams = makePostRequestParamsFactory(authToken);
 
     /** @type {CardsApi['getCards']} */
-    const getCards = () =>
-        fetch(
-            `${baseUrl}/cards`,
-            makeGetRequestParams(authToken),
-        ).then(
-            parseSuccessfulResponse(status => `cards request returns not ok status: ${status}`),
-        );
+    const getCards = () => fetch(cardsUrl, makeGetRequestParams(authToken)).then(
+        parseSuccessfulResponse(status => `cards request returns not ok status: ${status}`),
+    );
 
     /** @type {CardsApi['addCard']} */
-    const addCard = ({ name, link }) =>
-        fetch(
-            `${baseUrl}/cards`,
-            makePostRequestParams({ name, link }),
-        ).then(
-            parseSuccessfulResponse(status => `card adding request returns not ok status: ${status}`),
-        );
+    const addCard = ({ name, link }) => fetch(cardsUrl, makePostRequestParams({ name, link })).then(
+        parseSuccessfulResponse(status => `card adding request returns not ok status: ${status}`),
+    );
 
     /** @type {CardsApi['deleteCard']} */
-    const deleteCard = id =>
-        fetch(
-            `${baseUrl}/cards/${id}`,
-            makeDeleteRequestParams(authToken),
-        ).then(
-            parseSuccessfulResponse(status => `card deletion request returns not ok status: ${status}`),
-        );
+    const deleteCard = id => fetch(`${cardsUrl}/${id}`, makeDeleteRequestParams(authToken)).then(
+        parseSuccessfulResponse(status => `card deletion request returns not ok status: ${status}`),
+    );
 
     /** @type {CardsApi['addCardLike']} */
-    const addCardLike = id =>
-        fetch(
-            `${baseUrl}/cards/likes/${id}`,
-            makePutRequestParams(authToken),
-        ).then(
-            parseSuccessfulResponse(status => `card like adding request returns not ok status: ${status}`),
-        ).then(getLikesNumber);
+    const addCardLike = id => fetch(`${likesUrl}/${id}`, makePutRequestParams(authToken)).then(
+        parseSuccessfulResponse(status => `card like adding request returns not ok status: ${status}`),
+    ).then(getLikesNumber);
 
     /** @type {CardsApi['removeCardLike']} */
-    const removeCardLike = id =>
-        fetch(
-            `${baseUrl}/cards/likes/${id}`,
-            makeDeleteRequestParams(authToken),
-        ).then(
-            parseSuccessfulResponse(status => `card like removing request returns not ok status: ${status}`),
-        ).then(getLikesNumber);
+    const removeCardLike = id => fetch(`${likesUrl}/${id}`, makeDeleteRequestParams(authToken)).then(
+        parseSuccessfulResponse(status => `card like removing request returns not ok status: ${status}`),
+    ).then(getLikesNumber);
 
     return { getCards, addCard, deleteCard, addCardLike, removeCardLike };
 };

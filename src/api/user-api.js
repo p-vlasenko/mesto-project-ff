@@ -17,36 +17,29 @@ import {
 
 /** @type {(config: ApiConfig) => UserApi} */
 const makeUserApi = ({ baseUrl, authToken }) => {
+    const meUrl = `${baseUrl}/users/me`;
     const makePatchRequestParams = makePatchRequestParamsFactory(authToken);
 
     /** @type {UserApi['getUser']} */
     const getUser = () =>
-        fetch(
-            `${baseUrl}/users/me`,
-            makeGetRequestParams(authToken),
-        ).then(
+        fetch(meUrl, makeGetRequestParams(authToken)).then(
             parseSuccessfulResponse(status => `GET user request returns not ok status: ${status}`),
         );
 
     /** @type {UserApi['updateUser']} */
     const updateUser = params =>
-        fetch(
-            `${baseUrl}/users/me`,
-            makePatchRequestParams(params),
-        ).then(
+        fetch(meUrl, makePatchRequestParams(params)).then(
             parseSuccessfulResponse(status => `PATCH user request returns not ok status: ${status}`),
         );
 
     /** @type {UserApi['updateUser']} */
     const updateAvatar = url =>
-        fetch(
-            `${baseUrl}/users/me/avatar`,
-            makePatchRequestParams({ avatar: url }),
-        ).then(
-            parseSuccessfulResponse(status => `PATCH avatar request returns not ok status: ${status}`),
-        ).then(
-            user => user.avatar,
-        );
+        fetch(`${meUrl}/avatar`, makePatchRequestParams({ avatar: url }))
+            .then(
+                parseSuccessfulResponse(status => `PATCH avatar request returns not ok status: ${status}`),
+            ).then(
+                user => user.avatar,
+            );
 
     return { getUser, updateUser, updateAvatar };
 };
