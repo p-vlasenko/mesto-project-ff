@@ -8,6 +8,8 @@
     "url": "https://github.com/p-vlasenko/mesto-project-ff"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "build": "webpack --mode production",
     "dev": "webpack serve --open"
   },
@@ -21,6 +23,7 @@
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "7.1.2",
     "cssnano": "7.1.1",
+    "gh-pages": "6.3.0",
     "html-webpack-plugin": "5.6.4",
     "mini-css-extract-plugin": "2.9.4",
     "postcss-loader": "8.2.0",
