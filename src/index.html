@@ -60,6 +60,7 @@
           minlength="2"
           maxlength="200"
           pattern="^[a-zA-Zа-яёЁА-Я\s\-]+$"
+          data-pattern-mismatch-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
           required
         >
         <span class="person-description-input-error popup__input-error"></span>
@@ -72,7 +73,14 @@
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Обновить аватар</h3>
       <form class="popup__form" name="edit-avatar">
-        <input id="avatar-image-link-input" type="url" name="avatar-link" class="popup__input popup__input_type_url" placeholder="http://somewebsite.com/someimage.jpeg" required>
+        <input
+          id="avatar-image-link-input"
+          type="url"
+          name="avatar-link"
+          class="popup__input popup__input_type_url"
+          placeholder="http://somewebsite.com/someimage.jpeg"
+          required
+        >
         <span class="avatar-image-link-input-error popup__input-error"></span>
         <button type="submit" class="button popup__button popup__button_disabled" disabled>Сохранить</button>
       </form>
@@ -83,9 +91,27 @@
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Новое место</h3>
       <form class="popup__form" name="new-place">
-        <input id="place-name-input" type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" minlength="2" maxlength="30" pattern="^[a-zA-Zа-яёЁА-Я\s\-]+$" required>
+        <input
+          id="place-name-input"
+          type="text"
+          name="place-name"
+          class="popup__input popup__input_type_card-name"
+          placeholder="Название"
+          minlength="2"
+          maxlength="30"
+          pattern="^[a-zA-Zа-яёЁА-Я\s\-]+$"
+          data-pattern-mismatch-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+          required
+        >
         <span class="place-name-input-error popup__input-error"></span>
-        <input id="place-image-url-input" type="url" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required>
+        <input
+          id="place-image-url-input"
+          type="url"
+          name="link"
+          class="popup__input popup__input_type_url"
+          placeholder="Ссылка на картинку"
+          required
+        >
         <span class="place-image-url-input-error popup__input-error"></span>
         <button type="submit" class="button popup__button popup__button_disabled" disabled>Сохранить</button>
       </form>
