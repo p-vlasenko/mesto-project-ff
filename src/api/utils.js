@@ -1,5 +1,5 @@
 // @ts-check
-import { authHeader, HEADERS, HTTP_METHOD, jsonContentHeader } from './constants.js';
+import { HEADERS, HTTP_METHOD, jsonContentHeader } from './constants.js';
 
 /** @type {(authToken: string) => { [key: string]: string }} */
 export const makeAuthHeader = authToken => ({

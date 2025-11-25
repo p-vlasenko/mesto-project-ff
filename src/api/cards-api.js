@@ -7,12 +7,7 @@ import {
 } from './utils.js';
 
 /** @typedef {import('../types.js').Card} Card */
-
-/**
- * @typedef {object} CardsApiParams
- * @property {string} baseUrl
- * @property {string} authToken
- */
+/** @typedef {import('./config.js').ApiConfig} ApiConfig */
 
 /**
  * @typedef {object} CardsApi
@@ -23,18 +18,20 @@ import {
  * @property {(id: Card['_id']) => Promise<number>} removeCardLike
  */
 
-/** @type {(params: CardsApiParams) => CardsApi} */
+/** @type {(config: ApiConfig) => CardsApi} */
 const makeCardsApi = ({ baseUrl, authToken }) => {
     const makePostRequestParams = makePostRequestParamsFactory(authToken);
 
-    /** @type {() => Promise<Card[]>} */
+    /** @type {CardsApi['getCards']} */
     const getCards = () =>
         fetch(
             `${baseUrl}/cards`,
             makeGetRequestParams(authToken),
-        ).then(parseSuccessfulResponse(status => `cards request returns not ok status: ${status}`));
+        ).then(
+            parseSuccessfulResponse(status => `cards request returns not ok status: ${status}`),
+        );
 
-    /** @type {(params: Pick<Card, 'name' | 'link'>) => Promise<Card>} */
+    /** @type {CardsApi['addCard']} */
     const addCard = ({ name, link }) =>
         fetch(
             `${baseUrl}/cards`,
@@ -43,7 +40,7 @@ const makeCardsApi = ({ baseUrl, authToken }) => {
             parseSuccessfulResponse(status => `card adding request returns not ok status: ${status}`),
         );
 
-    /** @type {(id: Card['_id']) => Promise<string>} */
+    /** @type {CardsApi['deleteCard']} */
     const deleteCard = id =>
         fetch(
             `${baseUrl}/cards/${id}`,
@@ -52,7 +49,7 @@ const makeCardsApi = ({ baseUrl, authToken }) => {
             parseSuccessfulResponse(status => `card deletion request returns not ok status: ${status}`),
         );
 
-    /** @type {(id: Card['_id']) => Promise<number>} */
+    /** @type {CardsApi['addCardLike']} */
     const addCardLike = id =>
         fetch(
             `${baseUrl}/cards/likes/${id}`,
@@ -61,7 +58,7 @@ const makeCardsApi = ({ baseUrl, authToken }) => {
             parseSuccessfulResponse(status => `card like adding request returns not ok status: ${status}`),
         ).then(getLikesNumber);
 
-    /** @type {(id: Card['_id']) => Promise<number>} */
+    /** @type {CardsApi['removeCardLike']} */
     const removeCardLike = id =>
         fetch(
             `${baseUrl}/cards/likes/${id}`,

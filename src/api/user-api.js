@@ -6,12 +6,7 @@ import {
 
 /** @typedef {import('../types.js').User} User */
 /** @typedef {import('../types.js').UpdateUserParams} UpdateUserParams */
-
-/**
- * @typedef {object} UserApiParams
- * @property {string} baseUrl
- * @property {string} authToken
- */
+/** @typedef {import('./config.js').ApiConfig} ApiConfig */
 
 /**
  * @typedef {object} UserApi
@@ -20,7 +15,7 @@ import {
  * @property {(url: string) => Promise<string>} updateAvatar
  */
 
-/** @type {(params: UserApiParams) => UserApi} */
+/** @type {(config: ApiConfig) => UserApi} */
 const makeUserApi = ({ baseUrl, authToken }) => {
     const makePatchRequestParams = makePatchRequestParamsFactory(authToken);
 
@@ -53,11 +48,7 @@ const makeUserApi = ({ baseUrl, authToken }) => {
             user => user.avatar,
         );
 
-    return {
-        getUser,
-        updateUser,
-        updateAvatar,
-    };
+    return { getUser, updateUser, updateAvatar };
 };
 
 export {

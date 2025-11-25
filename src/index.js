@@ -4,8 +4,8 @@ import './pages/index.css';
 
 /** see README.md about modules structure */
 import { makeCardsApi } from './api/cards-api.js';
-import { AUTH_TOKEN, BASE_URL } from './api/constants.js';
 import { makeUserApi } from './api/user-api.js';
+import { apiConfig } from './api/config.js';
 import { getModalCloseButton } from './components/modal.js';
 import {
     getButton,
@@ -95,24 +95,15 @@ const getAvatarWorkflowElements = () => {
     });
 };
 
+const { getUser, updateUser, updateAvatar } = makeUserApi(apiConfig);
+const { getCards, addCard, deleteCard, addCardLike, removeCardLike } = makeCardsApi(apiConfig);
+
 /**
  * @typedef {object} ProfileWorkflowDeps
  * @property {User} user
  * @property {UserApi['updateUser']} updateUser
  * @property {(form: HTMLFormElement) => void} resetValidationErrors
  */
-
-const { getUser, updateUser, updateAvatar } = makeUserApi({
-    baseUrl: BASE_URL,
-    authToken: AUTH_TOKEN,
-});
-
-const { getCards, addCard, deleteCard, addCardLike, removeCardLike } = makeCardsApi({
-    baseUrl: BASE_URL,
-    authToken: AUTH_TOKEN,
-});
-
-enableValidation();
 
 /** @type {(deps: ProfileWorkflowDeps) => void} */
 const initProfileWorkflow = ({ user }) => flow(
@@ -152,6 +143,8 @@ const initPlaceCardsWorkflow = ({ user, cards }) => {
         initNewCardModal({ ...deps, user, cards }),
     )();
 };
+
+enableValidation();
 
 await Promise.all([getUser(), getCards()]).then(([user, cards]) => {
     initProfileWorkflow({ user });
