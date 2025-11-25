@@ -2,7 +2,7 @@ import './images/avatar.jpg';
 import './images/logo.svg';
 import './pages/index.css';
 
-/** see README.md about modules structure */
+/** see MODULES_README.md about modules structure */
 import { makeCardsApi } from './api/cards-api.js';
 import { makeUserApi } from './api/user-api.js';
 import { apiConfig } from './api/config.js';
